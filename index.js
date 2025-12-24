@@ -43,12 +43,17 @@ const corsOptions = {
   optionsSuccessStatus: 204,
 };
 
-// Middleware order: JSON parser first, then CORS
+// Middleware order: JSON parser first, then CORS, then OPTIONS handler
 app.use(express.json());
 app.use(cors(corsOptions));
 
-// Explicit preflight handler for all routes
-app.options("*", cors(corsOptions));
+// Safe global OPTIONS handler using middleware instead of routing
+app.use((req, res, next) => {
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(204);
+  }
+  next();
+});
 
 app.use(cookieParser());
 
