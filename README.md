@@ -5,9 +5,13 @@ A full-stack web application for AI automation services with user authentication
 ## Project Structure
 
 ```
-import-ai-time-saver-34-main/
+importai/
 ├── frontend/          # React + TypeScript + Vite
-├── backend/           # Node.js + Express + MongoDB
+├── index.js           # Backend server entry point
+├── package.json       # Backend dependencies
+├── middleware/        # Backend middleware
+├── models/            # Backend data models
+├── routes/            # Backend API routes
 └── README.md
 ```
 
@@ -25,19 +29,14 @@ Or use the individual scripts:
 
 #### Backend Setup
 
-1. **Navigate to backend directory:**
-   ```bash
-   cd backend
-   ```
-
-2. **Install dependencies:**
+1. **Install dependencies:**
    ```bash
    npm install
    ```
 
-3. **Set up environment variables:**
+2. **Set up environment variables:**
    
-   Create a `.env` file in the `backend` folder with:
+   Create a `.env` file in the root directory with:
    ```
    FRONTEND_URL=http://localhost:8080
    JWT_SECRET=importai_super_secret_jwt_2025

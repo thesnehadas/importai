@@ -10,6 +10,8 @@ import { Footer } from "@/components/layout/Footer";
 import Index from "./pages/Index";
 import Demos from "./pages/Demos";
 import CaseStudies from "./pages/CaseStudies";
+import CaseStudyDetail from "./pages/CaseStudyDetail";
+import Admin from "./pages/Admin";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Login from "./pages/Login";
@@ -33,6 +35,8 @@ const App = () => (
                   <Route path="/" element={<Index />} />
                   <Route path="/demos" element={<Demos />} />
                   <Route path="/case-studies" element={<CaseStudies />} />
+                  <Route path="/case-studies/:id" element={<CaseStudyDetail />} />
+                  <Route path="/admin" element={<Admin />} />
                   <Route path="/about" element={<About />} />
                   <Route path="/contact" element={<Contact />} />
                   <Route path="/login" element={<Login />} />

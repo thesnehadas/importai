@@ -1,10 +1,48 @@
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 import { ArrowRight, Clock, TrendingUp, Users, Calendar } from "lucide-react";
 
+const STORAGE_KEY = "case_studies";
+
 export default function CaseStudies() {
-  const caseStudies = [
+  const [caseStudies, setCaseStudies] = useState<any[]>([]);
+
+  useEffect(() => {
+    loadCaseStudies();
+  }, []);
+
+  const loadCaseStudies = () => {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      try {
+        const studies = JSON.parse(stored);
+        setCaseStudies(studies);
+      } catch (e) {
+        console.error("Error loading case studies:", e);
+      }
+    } else {
+      // Default case studies if none exist
+      const defaultStudies = [
+    {
+      id: "jupiter-outbound",
+      title: "Jupiter: Building a Multi-Channel Outbound Engine from Scratch",
+      company: "Jupiter",
+      industry: "YC S19",
+      challenge: "Manual outbound was limiting growth to 30-40 brands per week. CEO spending 10+ hours weekly on cold emails.",
+      solution: "Always-on outbound SDR coordinating email and LinkedIn without human handoffs",
+      results: [
+        { metric: "2,100+", description: "brands/week reached" },
+        { metric: "24", description: "meetings booked" },
+        { metric: "8 hrs", description: "CEO time saved/week" }
+      ],
+      timeline: "Aug 2025 - Present",
+      roi: "Ongoing",
+      description: "How Jupiter scaled brand outreach from 40/week to 2,100/week with coordinated email + LinkedIn automation.",
+      image: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=600&h=400&fit=crop",
+      tags: ["Revenue", "Outbound", "Multi-Channel"]
+    },
     {
       id: "techflow-lead-automation",
       title: "TechFlow Solutions: 3x Lead Conversion with AI",
@@ -59,7 +97,30 @@ export default function CaseStudies() {
       image: "https://images.unsplash.com/photo-1533750349088-cd871a92f312?w=600&h=400&fit=crop",
       tags: ["Support", "AI Assistant", "Customer Service"]
     }
-  ];
+      ];
+      setCaseStudies(defaultStudies);
+    }
+  };
+
+  // Convert detail format to listing format
+  const formatForListing = (study: any) => {
+    return {
+      id: study.id,
+      title: study.title,
+      company: study.company || study.client,
+      industry: study.industry || "",
+      challenge: study.challenge || study.problem?.content?.substring(0, 100) + "...",
+      solution: study.solutionShort || study.solution?.content?.substring(0, 100) + "...",
+      results: study.resultsShort || [],
+      timeline: study.timelineShort || study.timeline,
+      roi: study.roi || "",
+      description: study.description || study.solution?.content?.substring(0, 200) + "...",
+      image: study.image || "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=600&h=400&fit=crop",
+      tags: study.tags || []
+    };
+  };
+
+  const displayStudies = caseStudies.map(formatForListing);
 
   return (
     <div className="pt-24 pb-16">
@@ -79,7 +140,7 @@ export default function CaseStudies() {
       <section className="py-16">
         <div className="container mx-auto px-6">
           <div className="space-y-12">
-            {caseStudies.map((study, index) => (
+            {displayStudies.map((study, index) => (
               <div key={study.id} className="glass-card p-8 group hover:scale-[1.02] transition-all duration-300">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
                   {/* Content */}
@@ -125,9 +186,11 @@ export default function CaseStudies() {
                       </div>
                     </div>
 
-                    <Button variant="outline" className="group">
-                      Read Full Case Study
-                      <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                    <Button variant="outline" className="group" asChild>
+                      <Link to={`/case-studies/${study.id}`}>
+                        Read Full Case Study
+                        <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                      </Link>
                     </Button>
                   </div>
 
