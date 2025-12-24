@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Calendar } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -66,8 +66,12 @@ export function Navigation() {
               <span className="text-sm text-muted-foreground">
                 Hello {userName || "User"}
               </span>
-              <Button variant="hero" size="sm" className="animate-glow" onClick={handleBookDemo}>
-                <Calendar className="w-4 h-4 mr-2" />
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="border-primary/50 bg-primary/5 hover:bg-primary/10 hover:border-primary text-primary font-semibold px-6" 
+                onClick={handleBookDemo}
+              >
                 Book a Free AI Consultation
               </Button>
             </>
@@ -115,8 +119,12 @@ export function Navigation() {
                   <div className="text-sm text-muted-foreground text-center pb-2">
                     Hello {userName || "User"}
                   </div>
-                  <Button variant="hero" size="sm" className="w-full" onClick={handleBookDemo}>
-                    <Calendar className="w-4 h-4 mr-2" />
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full border-primary/50 bg-primary/5 hover:bg-primary/10 hover:border-primary text-primary font-semibold" 
+                    onClick={handleBookDemo}
+                  >
                     Book a Free AI Consultation
                   </Button>
                 </>

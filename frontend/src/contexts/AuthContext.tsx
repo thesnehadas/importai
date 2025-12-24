@@ -18,6 +18,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return localStorage.getItem('user_name');
   });
 
+  // Fetch user info if token exists but userName doesn't
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      const storedToken = localStorage.getItem('auth_token');
+      const storedUserName = localStorage.getItem('user_name');
+      
+      if (storedToken && !storedUserName) {
+        try {
+          const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+          const response = await fetch(`${apiUrl}/api/auth/me`, {
+            headers: {
+              'Authorization': `Bearer ${storedToken}`,
+            },
+          });
+          
+          if (response.ok) {
+            const user = await response.json();
+            if (user.name) {
+              setUserName(user.name);
+              localStorage.setItem('user_name', user.name);
+            }
+          }
+        } catch (error) {
+          console.error('Failed to fetch user info:', error);
+        }
+      }
+    };
+
+    fetchUserInfo();
+  }, []);
+
   const login = (newToken: string, name: string) => {
     setToken(newToken);
     setUserName(name);
