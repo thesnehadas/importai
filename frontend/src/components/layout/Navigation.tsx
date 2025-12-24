@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ThemeToggle } from "./ThemeToggle";
-import { Menu, X, Calendar, Play, LogOut } from "lucide-react";
+import { Menu, X, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -17,12 +16,7 @@ export function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { isAuthenticated, logout } = useAuth();
-
-  const handleLogout = () => {
-    logout();
-    // Optionally redirect to home page
-  };
+  const { isAuthenticated, userName } = useAuth();
 
   const handleBookDemo = () => {
     if (!isAuthenticated) {
@@ -67,16 +61,14 @@ export function Navigation() {
 
         {/* Actions */}
         <div className="hidden md:flex items-center space-x-4">
-          <ThemeToggle />
           {isAuthenticated ? (
             <>
-              <Button variant="ghost" size="sm" onClick={handleLogout}>
-                <LogOut className="w-4 h-4 mr-2" />
-                Logout
-              </Button>
+              <span className="text-sm text-muted-foreground">
+                Hello {userName || "User"}
+              </span>
               <Button variant="hero" size="sm" className="animate-glow" onClick={handleBookDemo}>
                 <Calendar className="w-4 h-4 mr-2" />
-                Book Demo
+                Book a Free AI Consultation
               </Button>
             </>
           ) : (
@@ -88,7 +80,6 @@ export function Navigation() {
 
         {/* Mobile Menu Button */}
         <div className="md:hidden flex items-center space-x-2">
-          <ThemeToggle />
           <Button
             variant="ghost"
             size="icon"
@@ -121,13 +112,12 @@ export function Navigation() {
             <div className="pt-4 space-y-3">
               {isAuthenticated ? (
                 <>
-                  <Button variant="ghost" size="sm" className="w-full" onClick={handleLogout}>
-                    <LogOut className="w-4 h-4 mr-2" />
-                    Logout
-                  </Button>
+                  <div className="text-sm text-muted-foreground text-center pb-2">
+                    Hello {userName || "User"}
+                  </div>
                   <Button variant="hero" size="sm" className="w-full" onClick={handleBookDemo}>
                     <Calendar className="w-4 h-4 mr-2" />
-                    Book Demo
+                    Book a Free AI Consultation
                   </Button>
                 </>
               ) : (

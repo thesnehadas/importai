@@ -33,7 +33,7 @@ export default function Login() {
 
       if (response.ok) {
         const data = await response.json();
-        login(data.token);
+        login(data.token, data.user.name);
         toast({
           title: "Login successful!",
           description: `Welcome back, ${data.user.name}!`,
@@ -74,7 +74,7 @@ export default function Login() {
 
       if (response.ok) {
         const data = await response.json();
-        login(data.token);
+        login(data.token, data.user.name);
         toast({
           title: "Account created!",
           description: `Welcome to Import AI, ${data.user.name}!`,
