@@ -90,10 +90,11 @@ router.get("/", async (req, res) => {
     
     const skip = (parseInt(page) - 1) * parseInt(limit);
     
-    // For admin, sort by updatedAt (most recent first), for public sort by publishedAt
+    // Sort by featured first, then by date (most recent first)
+    // For admin, sort by updatedAt, for public sort by publishedAt
     const sortOrder = isAdmin 
-      ? { updatedAt: -1, createdAt: -1 }
-      : { publishedAt: -1, createdAt: -1 };
+      ? { featured: -1, updatedAt: -1, createdAt: -1 }
+      : { featured: -1, publishedAt: -1, createdAt: -1 };
     
     const articles = await Article.find(query)
       .sort(sortOrder)

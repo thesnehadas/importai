@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, ArrowLeft, Share2 } from "lucide-react";
 import { getApiUrl } from "@/lib/api";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface Article {
   _id: string;
@@ -78,39 +80,6 @@ export default function ArticleDetail() {
       month: "long",
       day: "numeric",
     });
-  };
-
-  // Simple markdown to HTML converter (basic)
-  const renderContent = (content: string) => {
-    // Convert markdown headers
-    let html = content
-      .replace(/^### (.*$)/gim, '<h3 class="text-2xl font-bold mt-8 mb-4">$1</h3>')
-      .replace(/^## (.*$)/gim, '<h2 class="text-3xl font-bold mt-10 mb-6">$1</h2>')
-      .replace(/^# (.*$)/gim, '<h1 class="text-4xl font-bold mt-12 mb-8">$1</h1>')
-      // Convert bold
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      // Convert italic
-      .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      // Convert links
-      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-primary hover:underline">$1</a>')
-      // Convert code blocks
-      .replace(/```([^`]+)```/g, '<pre class="bg-muted p-4 rounded-lg overflow-x-auto my-4"><code>$1</code></pre>')
-      // Convert inline code
-      .replace(/`([^`]+)`/g, '<code class="bg-muted px-1.5 py-0.5 rounded text-sm">$1</code>')
-      // Convert lists
-      .replace(/^\* (.*$)/gim, '<li class="ml-6">$1</li>')
-      .replace(/^- (.*$)/gim, '<li class="ml-6">$1</li>')
-      // Convert paragraphs
-      .split('\n\n')
-      .map(para => {
-        if (para.trim() && !para.match(/^<[h|u|o|l|p]/)) {
-          return `<p class="mb-4 leading-relaxed">${para.trim()}</p>`;
-        }
-        return para;
-      })
-      .join('\n');
-
-    return { __html: html };
   };
 
   if (loading) {
@@ -220,10 +189,48 @@ export default function ArticleDetail() {
           )}
 
           {/* Article Content */}
-          <div 
-            className="prose prose-invert max-w-none mb-12"
-            dangerouslySetInnerHTML={renderContent(article.content)}
-          />
+          <div className="prose prose-invert max-w-none mb-12">
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={{
+                h1: ({node, ...props}: any) => <h1 className="text-4xl font-bold mt-12 mb-8" {...props} />,
+                h2: ({node, ...props}: any) => <h2 className="text-3xl font-bold mt-10 mb-6" {...props} />,
+                h3: ({node, ...props}: any) => <h3 className="text-2xl font-bold mt-8 mb-4" {...props} />,
+                h4: ({node, ...props}: any) => <h4 className="text-xl font-bold mt-6 mb-3" {...props} />,
+                p: ({node, ...props}: any) => <p className="mb-4 leading-relaxed" {...props} />,
+                a: ({node, ...props}: any) => <a className="text-primary hover:underline" {...props} />,
+                code: ({node, inline, ...props}: any) => 
+                  inline ? (
+                    <code className="bg-muted px-1.5 py-0.5 rounded text-sm" {...props} />
+                  ) : (
+                    <pre className="bg-muted p-4 rounded-lg overflow-x-auto my-4"><code {...props} /></pre>
+                  ),
+                ul: ({node, ...props}: any) => <ul className="list-disc ml-6 mb-4" {...props} />,
+                ol: ({node, ...props}: any) => <ol className="list-decimal ml-6 mb-4" {...props} />,
+                li: ({node, ...props}: any) => <li className="mb-2" {...props} />,
+                blockquote: ({node, ...props}: any) => (
+                  <blockquote className="border-l-4 border-primary pl-4 italic my-4 text-muted-foreground" {...props} />
+                ),
+                table: ({node, ...props}: any) => (
+                  <div className="overflow-x-auto my-6">
+                    <table className="min-w-full border-collapse border border-border" {...props} />
+                  </div>
+                ),
+                thead: ({node, ...props}: any) => <thead className="bg-muted" {...props} />,
+                tbody: ({node, ...props}: any) => <tbody {...props} />,
+                th: ({node, ...props}: any) => (
+                  <th className="border border-border px-4 py-2 text-left font-semibold" {...props} />
+                ),
+                td: ({node, ...props}: any) => (
+                  <td className="border border-border px-4 py-2" {...props} />
+                ),
+                tr: ({node, ...props}: any) => <tr {...props} />,
+                hr: ({node, ...props}: any) => <hr className="my-8 border-border" {...props} />,
+              }}
+            >
+              {article.content}
+            </ReactMarkdown>
+          </div>
 
           {/* Tags */}
           {article.tags && article.tags.length > 0 && (

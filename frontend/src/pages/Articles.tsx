@@ -21,6 +21,7 @@ interface Article {
   publishedAt?: string;
   readingTime?: number;
   views?: number;
+  featured?: boolean;
   author?: {
     name: string;
   };
@@ -199,11 +200,18 @@ export default function Articles() {
                         />
                       </div>
                     )}
-                    {article.category && (
-                      <Badge variant="outline" className="mb-3 w-fit">
-                        {article.category}
-                      </Badge>
-                    )}
+                    <div className="flex items-center gap-2 mb-3 flex-wrap">
+                      {article.featured && (
+                        <Badge variant="default" className="bg-yellow-500/10 text-yellow-500 border border-yellow-500/20">
+                          Featured
+                        </Badge>
+                      )}
+                      {article.category && (
+                        <Badge variant="outline" className="w-fit">
+                          {article.category}
+                        </Badge>
+                      )}
+                    </div>
                     <h2 className="text-xl font-bold mb-3 group-hover:text-primary transition-colors line-clamp-2">
                       {article.title}
                     </h2>

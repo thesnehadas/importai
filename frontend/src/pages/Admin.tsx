@@ -122,6 +122,7 @@ export default function Admin() {
     category: "",
     tags: [],
     status: "Draft",
+    featured: false,
     publishedAt: "",
     scheduledAt: "",
     author: { name: "", bio: "", profileImage: "" },
@@ -756,6 +757,7 @@ The system thinks about each prospect's journey, not just "send message → hope
       category: "",
       tags: [],
       status: "Draft",
+      featured: false,
       publishedAt: "",
       scheduledAt: "",
       author: { name: "", bio: "", profileImage: "" },
@@ -788,6 +790,7 @@ The system thinks about each prospect's journey, not just "send message → hope
         category: article.category || "",
         tags: Array.isArray(article.tags) ? article.tags : [],
         status: article.status || "Draft",
+        featured: article.featured || false,
         publishedAt: article.publishedAt ? new Date(article.publishedAt).toISOString().split('T')[0] : "",
         scheduledAt: article.scheduledAt ? new Date(article.scheduledAt).toISOString().split('T')[0] : "",
         author: {
@@ -912,6 +915,7 @@ The system thinks about each prospect's journey, not just "send message → hope
       if (articleFormData.status) {
         articleData.status = articleFormData.status;
       }
+      articleData.featured = articleFormData.featured || false;
       if (articleFormData.schemaType) {
         articleData.schemaType = articleFormData.schemaType;
       }
@@ -1888,6 +1892,11 @@ The system thinks about each prospect's journey, not just "send message → hope
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
                             <h3 className="font-semibold">{article.title}</h3>
+                            {article.featured && (
+                              <Badge variant="default" className="bg-yellow-500/10 text-yellow-500 border border-yellow-500/20">
+                                Featured
+                              </Badge>
+                            )}
                             <Badge variant={article.status === 'Published' ? 'default' : 'outline'}>
                               {article.status}
                             </Badge>
@@ -2252,6 +2261,20 @@ The system thinks about each prospect's journey, not just "send message → hope
                               <SelectItem value="Archived">Archived</SelectItem>
                             </SelectContent>
                           </Select>
+                        </div>
+
+                        <div className="flex items-center justify-between p-4 border rounded-lg">
+                          <div className="space-y-0.5">
+                            <Label htmlFor="featured">Featured Article</Label>
+                            <p className="text-xs text-muted-foreground">
+                              Featured articles appear first in the articles list
+                            </p>
+                          </div>
+                          <Switch
+                            id="featured"
+                            checked={articleFormData.featured || false}
+                            onCheckedChange={(checked) => setArticleFormData({ ...articleFormData, featured: checked })}
+                          />
                         </div>
 
                         <div className="space-y-2">

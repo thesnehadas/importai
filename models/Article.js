@@ -105,6 +105,10 @@ const ArticleSchema = new mongoose.Schema(
       enum: ['Draft', 'Review', 'Scheduled', 'Published', 'Archived'],
       default: 'Draft',
     },
+    featured: {
+      type: Boolean,
+      default: false,
+    },
     publishedAt: {
       type: Date,
     },
@@ -190,6 +194,7 @@ const ArticleSchema = new mongoose.Schema(
 // Index for search and filtering
 ArticleSchema.index({ slug: 1 });
 ArticleSchema.index({ status: 1, publishedAt: -1 });
+ArticleSchema.index({ featured: -1, publishedAt: -1 }); // For featured articles sorting
 ArticleSchema.index({ category: 1 });
 ArticleSchema.index({ tags: 1 });
 ArticleSchema.index({ primaryKeyword: 1 });
