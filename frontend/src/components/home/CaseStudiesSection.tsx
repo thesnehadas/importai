@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
-import { ArrowRight, TrendingUp, Clock, Users } from "lucide-react";
+import { ArrowRight, TrendingUp, Clock, Users, ChevronLeft, ChevronRight } from "lucide-react";
 
 const STORAGE_KEY = "case_studies";
 const MAX_DISPLAY = 4;
@@ -12,6 +12,8 @@ export function CaseStudiesSection() {
   const [visibleIndex, setVisibleIndex] = useState(0);
   const sectionRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const autoPlayIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
     loadCaseStudies();
@@ -152,92 +154,56 @@ export function CaseStudiesSection() {
 
   const displayStudies = caseStudies.map(formatForListing);
 
+  // Auto-play functionality - loops continuously
   useEffect(() => {
     if (displayStudies.length === 0) return;
 
-    const handleScroll = () => {
-      if (!sectionRef.current) return;
+    // Clear any existing interval
+    if (autoPlayIntervalRef.current) {
+      clearInterval(autoPlayIntervalRef.current);
+    }
 
-      const rect = sectionRef.current.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
-      
-      // Get section's position in document
-      const sectionTop = window.scrollY + rect.top;
-      const sectionHeight = rect.height;
-      
-      // Calculate when section enters viewport (when top reaches viewport top)
-      const animationStart = sectionTop - windowHeight;
-      const animationEnd = sectionTop + sectionHeight - windowHeight;
-      
-      // Current scroll position
-      const currentScroll = window.scrollY;
-      
-      // Check if we're before, during, or after the section
-      if (currentScroll < animationStart) {
-        // Before section - show first card
-        if (visibleIndex !== 0) {
-          setVisibleIndex(0);
-        }
-        return;
-      }
-      
-      if (currentScroll >= animationEnd) {
-        // After section - show last card
-        if (visibleIndex !== displayStudies.length - 1) {
-          setVisibleIndex(displayStudies.length - 1);
-        }
-        return;
-      }
-      
-      // We're scrolling through the section
-      // Calculate progress (0 to 1)
-      const totalScrollDistance = animationEnd - animationStart;
-      const scrollProgress = (currentScroll - animationStart) / totalScrollDistance;
-      const clampedProgress = Math.max(0, Math.min(1, scrollProgress));
-      
-      // Divide into equal segments for each card
-      const segmentSize = 1 / displayStudies.length;
-      let newIndex = Math.floor(clampedProgress / segmentSize);
-      
-      // Ensure we show the last card when we reach the end
-      if (clampedProgress >= 1 - (segmentSize / 3)) {
-        newIndex = displayStudies.length - 1;
-      }
-      
-      // Clamp to valid range
-      newIndex = Math.max(0, Math.min(newIndex, displayStudies.length - 1));
-      
-      // Only update if changed
-      if (newIndex !== visibleIndex) {
-        setVisibleIndex(newIndex);
-      }
-    };
+    // If paused, don't start the interval
+    if (isPaused) return;
 
-    // Use requestAnimationFrame for smooth updates
-    let rafId: number | null = null;
-    const throttledScroll = () => {
-      if (rafId === null) {
-        rafId = requestAnimationFrame(() => {
-          handleScroll();
-          rafId = null;
-        });
-      }
-    };
-
-    window.addEventListener("scroll", throttledScroll, { passive: true });
-    window.addEventListener("resize", handleScroll, { passive: true });
-    
-    // Initial check
-    setTimeout(handleScroll, 100);
+    // Auto-advance cards every 2.5 seconds, looping continuously
+    autoPlayIntervalRef.current = setInterval(() => {
+      setVisibleIndex((prev) => {
+        // Loop back to first card after last card
+        return (prev + 1) % displayStudies.length;
+      });
+    }, 2500);
 
     return () => {
-      window.removeEventListener("scroll", throttledScroll);
-      window.removeEventListener("resize", handleScroll);
-      if (rafId !== null) {
-        cancelAnimationFrame(rafId);
+      if (autoPlayIntervalRef.current) {
+        clearInterval(autoPlayIntervalRef.current);
       }
     };
-  }, [displayStudies.length, visibleIndex]);
+  }, [displayStudies.length, isPaused]);
+
+  // Pause auto-play when user hovers over section
+  const handleMouseEnter = () => {
+    setIsPaused(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsPaused(false);
+  };
+
+  // Manual navigation functions
+  const goToPrevious = () => {
+    setVisibleIndex((prev) => (prev > 0 ? prev - 1 : displayStudies.length - 1));
+    setIsPaused(true);
+    // Resume after 5 seconds
+    setTimeout(() => setIsPaused(false), 5000);
+  };
+
+  const goToNext = () => {
+    setVisibleIndex((prev) => (prev < displayStudies.length - 1 ? prev + 1 : 0));
+    setIsPaused(true);
+    // Resume after 5 seconds
+    setTimeout(() => setIsPaused(false), 5000);
+  };
 
   // Always show the section, even if no case studies (will show loading state)
   if (displayStudies.length === 0 && caseStudies.length === 0) {
@@ -260,38 +226,39 @@ export function CaseStudiesSection() {
   return (
     <section 
       ref={sectionRef} 
-      className="bg-background relative overflow-hidden -mt-8"
-      style={{ 
-        height: `${displayStudies.length * 30}vh`, // Minimal height - just enough for scroll animation
-        position: 'relative'
-      }}
+      className="bg-background relative overflow-hidden py-12 md:py-16"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
-      {/* Sticky container that stays in view while scrolling */}
-      <div 
-        className="sticky"
-        style={{
-          top: '100px', // Account for navbar
-          height: 'calc(100vh - 100px)',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          paddingTop: '0.5rem',
-          paddingBottom: '0.5rem'
-        }}
-      >
-        <div className="container mx-auto px-6 max-w-7xl relative z-10 w-full">
-          {/* Section Header */}
-          <div className="mb-4 text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-2">
-              Real <span className="text-gradient">Results</span>
-            </h2>
-            <p className="text-base md:text-lg text-muted-foreground max-w-3xl mx-auto">
-              See how businesses are saving time, reducing costs, and accelerating growth with AI automation.
-            </p>
-          </div>
+      <div className="container mx-auto px-6 max-w-7xl relative z-10 w-full">
+        {/* Section Header */}
+        <div className="mb-8 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-2">
+            Real <span className="text-gradient">Results</span>
+          </h2>
+          <p className="text-base md:text-lg text-muted-foreground max-w-3xl mx-auto">
+            See how businesses are saving time, reducing costs, and accelerating growth with AI automation.
+          </p>
+        </div>
 
-          {/* Case Study Cards Container - Fixed visual height, cards swap on scroll */}
-          <div className="relative" style={{ minHeight: '380px', maxHeight: '420px' }}>
+        {/* Case Study Cards Container - Fixed visual height, cards swap automatically */}
+        <div className="relative mb-6" style={{ minHeight: '380px', maxHeight: '420px' }}>
+            {/* Navigation Arrows */}
+            <button
+              onClick={goToPrevious}
+              className="absolute left-2 top-1/2 -translate-y-1/2 z-20 bg-background/80 hover:bg-background border border-border rounded-full p-2 transition-all duration-300 hover:scale-110 hover:shadow-lg"
+              aria-label="Previous case study"
+            >
+              <ChevronLeft className="w-6 h-6 text-foreground" />
+            </button>
+            <button
+              onClick={goToNext}
+              className="absolute right-2 top-1/2 -translate-y-1/2 z-20 bg-background/80 hover:bg-background border border-border rounded-full p-2 transition-all duration-300 hover:scale-110 hover:shadow-lg"
+              aria-label="Next case study"
+            >
+              <ChevronRight className="w-6 h-6 text-foreground" />
+            </button>
+
           {displayStudies.map((study, index) => {
             const isVisible = index === visibleIndex;
             
@@ -387,37 +354,34 @@ export function CaseStudiesSection() {
           })}
           </div>
 
-          {/* Progress Indicator */}
-          <div className="flex justify-center gap-2 mt-4">
-            {displayStudies.map((_, index) => (
-              <div
-                key={index}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
-                  index === visibleIndex
-                    ? "w-6 bg-primary"
-                    : index < visibleIndex
-                    ? "w-1.5 bg-primary/50"
-                    : "w-1.5 bg-muted"
-                }`}
-              />
-            ))}
-          </div>
+        {/* Progress Indicator */}
+        <div className="flex justify-center gap-2 mb-8">
+          {displayStudies.map((_, index) => (
+            <div
+              key={index}
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                index === visibleIndex
+                  ? "w-6 bg-primary"
+                  : index < visibleIndex
+                  ? "w-1.5 bg-primary/50"
+                  : "w-1.5 bg-muted"
+              }`}
+            />
+          ))}
+        </div>
 
-          {/* CTA after last case study */}
-          {visibleIndex === displayStudies.length - 1 && (
-            <div className="mt-4 text-center animate-fade-in">
-              <h3 className="text-base font-bold mb-1">Explore More Case Studies</h3>
-              <p className="text-xs text-muted-foreground mb-3 max-w-2xl mx-auto">
-                Discover more success stories and see how AI automation can transform your business.
-              </p>
-              <Button variant="gradient" size="sm" className="px-4 py-2 text-sm" asChild>
-                <Link to="/case-studies">
-                  View All Case Studies
-                  <ArrowRight className="w-3 h-3 ml-2" />
-                </Link>
-              </Button>
-            </div>
-          )}
+        {/* CTA - Always visible */}
+        <div className="text-center">
+          <h3 className="text-lg font-bold mb-2">Explore More Case Studies</h3>
+          <p className="text-sm text-muted-foreground mb-4 max-w-2xl mx-auto">
+            Discover more success stories and see how AI automation can transform your business.
+          </p>
+          <Button variant="gradient" size="default" className="px-6 py-3" asChild>
+            <Link to="/case-studies">
+              View All Case Studies
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Link>
+          </Button>
         </div>
       </div>
     </section>

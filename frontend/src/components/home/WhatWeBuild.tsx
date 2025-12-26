@@ -241,7 +241,7 @@ export function WhatWeBuild() {
         </div>
 
         {/* CTA */}
-        <div className="text-center">
+        <div className="text-center mt-8 mb-4">
           <Button 
             asChild
             variant="gradient"
