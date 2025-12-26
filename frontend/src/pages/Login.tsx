@@ -33,7 +33,7 @@ export default function Login() {
 
       if (response.ok) {
         const data = await response.json();
-        login(data.token, data.user.name);
+        login(data.token, data.user.name, data.user.role || 'user');
         toast({
           title: "Login successful!",
           description: `Welcome back, ${data.user.name}!`,
@@ -74,7 +74,7 @@ export default function Login() {
 
       if (response.ok) {
         const data = await response.json();
-        login(data.token, data.user.name);
+        login(data.token, data.user.name, data.user.role || 'user');
         toast({
           title: "Account created!",
           description: `Welcome to Import AI, ${data.user.name}!`,
@@ -265,11 +265,11 @@ export default function Login() {
 
           <p className="text-center text-sm text-muted-foreground mt-8">
             By continuing, you agree to our{" "}
-            <Link to="#" className="underline hover:text-foreground">
+            <Link to="/terms-of-service" className="underline hover:text-foreground">
               Terms of Service
             </Link>{" "}
             and{" "}
-            <Link to="#" className="underline hover:text-foreground">
+            <Link to="/privacy-policy" className="underline hover:text-foreground">
               Privacy Policy
             </Link>
           </p>

@@ -9,7 +9,7 @@ function signToken(user) {
     throw new Error("JWT_SECRET not configured in .env");
   }
   return jwt.sign(
-    { id: user._id, email: user.email },
+    { id: user._id, email: user.email, role: user.role || 'user' },
     process.env.JWT_SECRET,
     { expiresIn: "1h" }
   );
@@ -32,7 +32,8 @@ router.post("/register", async (req, res) => {
     }
     
     const hash = await bcrypt.hash(password, 10);
-    const user = await User.create({ name, email, password: hash });
+    // Always create regular users - admin users must be created manually
+    const user = await User.create({ name, email, password: hash, role: 'user' });
     const token = signToken(user);
     console.log("User registered successfully:", user._id);
     return res.status(201).json({
@@ -41,7 +42,8 @@ router.post("/register", async (req, res) => {
       user: {
         id: user._id,
         email: user.email,
-        name: user.name
+        name: user.name,
+        role: user.role
       }
     });
   } catch (err) {
@@ -75,7 +77,8 @@ router.post("/login", async (req, res) => {
       user: {
         id: user._id,
         email: user.email,
-        name: user.name
+        name: user.name,
+        role: user.role || 'user'
       }
     });
   } catch (err) {

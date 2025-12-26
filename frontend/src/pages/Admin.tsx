@@ -18,7 +18,8 @@ import {
   X,
   FileText,
   ArrowLeft,
-  Star
+  Star,
+  MessageSquare
 } from "lucide-react";
 
 interface CaseStudy {
@@ -65,14 +66,39 @@ interface CaseStudy {
 }
 
 const STORAGE_KEY = "case_studies";
+const REVIEWS_STORAGE_KEY = "reviews";
+
+interface Review {
+  id?: string;
+  quote: string;
+  author: string;
+  role: string;
+  company: string;
+  rating: number;
+  featured?: boolean;
+  order?: number;
+}
 
 export default function Admin() {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isAdmin, token } = useAuth();
   const { toast } = useToast();
   const [caseStudies, setCaseStudies] = useState<CaseStudy[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("list");
+  
+  // Reviews state
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
+  const [reviewFormData, setReviewFormData] = useState<Review>({
+    quote: "",
+    author: "",
+    role: "",
+    company: "",
+    rating: 5,
+    featured: false,
+    order: 0
+  });
   const [formData, setFormData] = useState<Partial<CaseStudy>>({
     problem: { title: "The Problem", content: "" },
     solution: { 
@@ -93,13 +119,23 @@ export default function Admin() {
   });
 
   useEffect(() => {
-    // Check authentication
+    // Check authentication and admin role
     if (!isAuthenticated) {
       navigate('/login');
       return;
     }
+    if (!isAdmin) {
+      toast({
+        title: "Access Denied",
+        description: "You don't have permission to access the admin panel.",
+        variant: "destructive",
+      });
+      navigate('/');
+      return;
+    }
     loadCaseStudies();
-  }, [isAuthenticated, navigate]);
+    loadReviews();
+  }, [isAuthenticated, isAdmin, navigate, toast]);
 
   const loadCaseStudies = () => {
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -376,6 +412,266 @@ The system thinks about each prospect's journey, not just "send message → hope
     });
   };
 
+  // Reviews functions
+  const loadReviews = async () => {
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+      const response = await fetch(`${apiUrl}/api/reviews`, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setReviews(data);
+        localStorage.setItem(REVIEWS_STORAGE_KEY, JSON.stringify(data));
+      } else {
+        const stored = localStorage.getItem(REVIEWS_STORAGE_KEY);
+        if (stored) {
+          try {
+            const reviewsData = JSON.parse(stored);
+            setReviews(reviewsData);
+          } catch (e) {
+            loadDefaultReviews();
+          }
+        } else {
+          loadDefaultReviews();
+        }
+      }
+    } catch (error) {
+      const stored = localStorage.getItem(REVIEWS_STORAGE_KEY);
+      if (stored) {
+        try {
+          const reviewsData = JSON.parse(stored);
+          setReviews(reviewsData);
+        } catch (e) {
+          loadDefaultReviews();
+        }
+      } else {
+        loadDefaultReviews();
+      }
+    }
+  };
+
+  const loadDefaultReviews = () => {
+    const defaults: Review[] = [
+      {
+        id: "review-1",
+        quote: "Import AI saved us 15 hours per week on lead qualification. Our conversion rate jumped 28% in the first month.",
+        author: "Sarah Chen",
+        role: "VP of Sales",
+        company: "TechFlow Solutions",
+        rating: 5,
+        featured: true,
+        order: 0
+      },
+      {
+        id: "review-2",
+        quote: "The invoice processing automation is incredible. What used to take days now happens in minutes with 99% accuracy.",
+        author: "Marcus Rodriguez",
+        role: "Finance Director",
+        company: "GrowthCorp",
+        rating: 5,
+        featured: true,
+        order: 1
+      },
+      {
+        id: "review-3",
+        quote: "Their AI support assistant handles 60% of our tickets automatically. Our team can finally focus on complex issues.",
+        author: "Emily Watson",
+        role: "Customer Success Manager",
+        company: "ServicePro",
+        rating: 5,
+        featured: true,
+        order: 2
+      }
+    ];
+    setReviews(defaults);
+    localStorage.setItem(REVIEWS_STORAGE_KEY, JSON.stringify(defaults));
+  };
+
+  const handleNewReview = () => {
+    setEditingReviewId(null);
+    setReviewFormData({
+      quote: "",
+      author: "",
+      role: "",
+      company: "",
+      rating: 5,
+      featured: false,
+      order: reviews.length
+    });
+    setActiveTab("review-form");
+  };
+
+  const handleEditReview = (review: Review) => {
+    setEditingReviewId(review.id || null);
+    setReviewFormData(review);
+    setActiveTab("review-form");
+  };
+
+  const handleDeleteReview = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this review?")) return;
+
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+      const response = await fetch(`${apiUrl}/api/reviews/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const updated = reviews.filter(r => r.id !== id);
+        setReviews(updated);
+        localStorage.setItem(REVIEWS_STORAGE_KEY, JSON.stringify(updated));
+        toast({
+          title: "Review deleted",
+          description: "The review has been deleted successfully.",
+        });
+      } else {
+        const updated = reviews.filter(r => r.id !== id);
+        setReviews(updated);
+        localStorage.setItem(REVIEWS_STORAGE_KEY, JSON.stringify(updated));
+        toast({
+          title: "Review deleted",
+          description: "The review has been deleted from local storage.",
+        });
+      }
+    } catch (error) {
+      const updated = reviews.filter(r => r.id !== id);
+      setReviews(updated);
+      localStorage.setItem(REVIEWS_STORAGE_KEY, JSON.stringify(updated));
+      toast({
+        title: "Review deleted",
+        description: "The review has been deleted from local storage.",
+      });
+    }
+  };
+
+  const handleSaveReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!reviewFormData.quote || !reviewFormData.author || !reviewFormData.role || !reviewFormData.company) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+      const url = editingReviewId 
+        ? `${apiUrl}/api/reviews/${editingReviewId}`
+        : `${apiUrl}/api/reviews`;
+      
+      const method = editingReviewId ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(reviewFormData)
+      });
+
+      if (response.ok) {
+        const savedReview = await response.json();
+        let updated: Review[];
+        
+        if (editingReviewId) {
+          updated = reviews.map(r => r.id === editingReviewId ? { ...savedReview, id: savedReview._id || savedReview.id } : r);
+        } else {
+          updated = [...reviews, { ...savedReview, id: savedReview._id || savedReview.id }];
+        }
+        
+        setReviews(updated);
+        localStorage.setItem(REVIEWS_STORAGE_KEY, JSON.stringify(updated));
+        
+        setEditingReviewId(null);
+        setReviewFormData({
+          quote: "",
+          author: "",
+          role: "",
+          company: "",
+          rating: 5,
+          featured: false,
+          order: 0
+        });
+        setActiveTab("reviews-list");
+        
+        toast({
+          title: "Review saved",
+          description: `Review has been ${editingReviewId ? "updated" : "created"} successfully.`,
+        });
+      } else {
+        const newId = editingReviewId || `review-${Date.now()}`;
+        const reviewToSave: Review = { ...reviewFormData, id: newId };
+        
+        let updated: Review[];
+        if (editingReviewId) {
+          updated = reviews.map(r => r.id === editingReviewId ? reviewToSave : r);
+        } else {
+          updated = [...reviews, reviewToSave];
+        }
+        
+        setReviews(updated);
+        localStorage.setItem(REVIEWS_STORAGE_KEY, JSON.stringify(updated));
+        
+        setEditingReviewId(null);
+        setReviewFormData({
+          quote: "",
+          author: "",
+          role: "",
+          company: "",
+          rating: 5,
+          featured: false,
+          order: 0
+        });
+        setActiveTab("reviews-list");
+        
+        toast({
+          title: "Review saved",
+          description: `Review has been ${editingReviewId ? "updated" : "created"} in local storage.`,
+        });
+      }
+    } catch (error) {
+      const newId = editingReviewId || `review-${Date.now()}`;
+      const reviewToSave: Review = { ...reviewFormData, id: newId };
+      
+      let updated: Review[];
+      if (editingReviewId) {
+        updated = reviews.map(r => r.id === editingReviewId ? reviewToSave : r);
+      } else {
+        updated = [...reviews, reviewToSave];
+      }
+      
+      setReviews(updated);
+      localStorage.setItem(REVIEWS_STORAGE_KEY, JSON.stringify(updated));
+      
+      setEditingReviewId(null);
+      setReviewFormData({
+        quote: "",
+        author: "",
+        role: "",
+        company: "",
+        rating: 5,
+        featured: false,
+        order: 0
+      });
+      setActiveTab("reviews-list");
+      
+      toast({
+        title: "Review saved",
+        description: `Review has been ${editingReviewId ? "updated" : "created"} in local storage.`,
+      });
+    }
+  };
+
   return (
     <div className="pt-24 pb-16 min-h-screen">
       <div className="container mx-auto px-6 max-w-7xl">
@@ -385,8 +681,8 @@ The system thinks about each prospect's journey, not just "send message → hope
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Portal
           </Button>
-          <h1 className="text-4xl font-bold mb-2">Case Studies Admin</h1>
-          <p className="text-muted-foreground">Manage and create case studies</p>
+          <h1 className="text-4xl font-bold mb-2">Admin Panel</h1>
+          <p className="text-muted-foreground">Manage case studies and reviews</p>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
@@ -394,6 +690,13 @@ The system thinks about each prospect's journey, not just "send message → hope
             <TabsTrigger value="list">All Case Studies</TabsTrigger>
             <TabsTrigger value="form">
               {editingId ? "Edit" : "New"} Case Study
+            </TabsTrigger>
+            <TabsTrigger value="reviews-list">
+              <MessageSquare className="w-4 h-4 mr-2" />
+              Reviews
+            </TabsTrigger>
+            <TabsTrigger value="review-form">
+              {editingReviewId ? "Edit" : "New"} Review
             </TabsTrigger>
           </TabsList>
 
@@ -967,6 +1270,223 @@ The system thinks about each prospect's journey, not just "send message → hope
                     Cancel
                   </Button>
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Reviews List Tab */}
+          <TabsContent value="reviews-list">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Reviews</CardTitle>
+                    <CardDescription>
+                      {reviews.length} review{reviews.length !== 1 ? "s" : ""} total
+                    </CardDescription>
+                  </div>
+                  <Button onClick={handleNewReview}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    New Review
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {reviews.length === 0 ? (
+                    <div className="text-center py-12 text-muted-foreground">
+                      <MessageSquare className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                      <p>No reviews yet. Create your first review!</p>
+                    </div>
+                  ) : (
+                    reviews.map((review) => (
+                      <div
+                        key={review.id}
+                        className="border rounded-lg p-4 hover:bg-accent/50 transition-colors"
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <p className="font-semibold text-sm italic line-clamp-2">
+                                "{review.quote}"
+                              </p>
+                              {review.featured && (
+                                <Badge variant="default" className="ml-2">
+                                  <Star className="w-3 h-3 mr-1" />
+                                  Featured
+                                </Badge>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                              <span className="font-medium">{review.author}</span>
+                              <span>{review.role} at {review.company}</span>
+                              <div className="flex items-center gap-1">
+                                {[...Array(review.rating)].map((_, i) => (
+                                  <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex gap-2 ml-4">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleEditReview(review)}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => review.id && handleDeleteReview(review.id)}
+                            >
+                              <Trash2 className="w-4 h-4 text-destructive" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Review Form Tab */}
+          <TabsContent value="review-form">
+            <Card>
+              <CardHeader>
+                <CardTitle>{editingReviewId ? "Edit Review" : "New Review"}</CardTitle>
+                <CardDescription>
+                  {editingReviewId ? "Update review details" : "Add a new customer review"}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleSaveReview} className="space-y-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="quote">Quote *</Label>
+                    <Textarea
+                      id="quote"
+                      value={reviewFormData.quote}
+                      onChange={(e) => setReviewFormData({ ...reviewFormData, quote: e.target.value })}
+                      placeholder="Customer review quote..."
+                      rows={4}
+                      required
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="author">Author Name *</Label>
+                      <Input
+                        id="author"
+                        value={reviewFormData.author}
+                        onChange={(e) => setReviewFormData({ ...reviewFormData, author: e.target.value })}
+                        placeholder="John Doe"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="role">Role/Title *</Label>
+                      <Input
+                        id="role"
+                        value={reviewFormData.role}
+                        onChange={(e) => setReviewFormData({ ...reviewFormData, role: e.target.value })}
+                        placeholder="VP of Sales"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="company">Company *</Label>
+                      <Input
+                        id="company"
+                        value={reviewFormData.company}
+                        onChange={(e) => setReviewFormData({ ...reviewFormData, company: e.target.value })}
+                        placeholder="TechFlow Solutions"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="rating">Rating *</Label>
+                      <Input
+                        id="rating"
+                        type="number"
+                        min="1"
+                        max="5"
+                        value={reviewFormData.rating}
+                        onChange={(e) => setReviewFormData({ ...reviewFormData, rating: parseInt(e.target.value) || 5 })}
+                        required
+                      />
+                      <div className="flex items-center gap-1 mt-2">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`w-5 h-5 ${
+                              i < reviewFormData.rating
+                                ? "fill-yellow-400 text-yellow-400"
+                                : "text-muted-foreground"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="featured"
+                      checked={reviewFormData.featured}
+                      onCheckedChange={(checked) => setReviewFormData({ ...reviewFormData, featured: checked })}
+                    />
+                    <Label htmlFor="featured">Featured Review</Label>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="order">Display Order</Label>
+                    <Input
+                      id="order"
+                      type="number"
+                      value={reviewFormData.order}
+                      onChange={(e) => setReviewFormData({ ...reviewFormData, order: parseInt(e.target.value) || 0 })}
+                      placeholder="0"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Lower numbers appear first. Featured reviews are prioritized.
+                    </p>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <Button type="submit">
+                      <Save className="w-4 h-4 mr-2" />
+                      {editingReviewId ? "Update" : "Create"} Review
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        setEditingReviewId(null);
+                        setReviewFormData({
+                          quote: "",
+                          author: "",
+                          role: "",
+                          company: "",
+                          rating: 5,
+                          featured: false,
+                          order: 0
+                        });
+                        setActiveTab("reviews-list");
+                      }}
+                    >
+                      <X className="w-4 h-4 mr-2" />
+                      Cancel
+                    </Button>
+                  </div>
+                </form>
               </CardContent>
             </Card>
           </TabsContent>

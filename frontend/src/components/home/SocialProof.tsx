@@ -1,10 +1,24 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { Star, Quote, ChevronLeft, ChevronRight } from "lucide-react";
 
+const REVIEWS_STORAGE_KEY = "reviews";
+
+interface Review {
+  id?: string;
+  quote: string;
+  author: string;
+  role: string;
+  company: string;
+  rating: number;
+  featured?: boolean;
+  order?: number;
+}
+
 export function SocialProof() {
   const [visibleIndex, setVisibleIndex] = useState(0);
   const autoPlayIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const [isPaused, setIsPaused] = useState(false);
+  const [testimonials, setTestimonials] = useState<Review[]>([]);
 
   // Generate stars once - more prominent
   const stars = useMemo(() => {
@@ -18,29 +32,69 @@ export function SocialProof() {
       opacity: 0.4 + Math.random() * 0.5,
     }));
   }, []);
-  const testimonials = [
-    {
-      quote: "Import AI saved us 15 hours per week on lead qualification. Our conversion rate jumped 28% in the first month.",
-      author: "Sarah Chen",
-      role: "VP of Sales",
-      company: "TechFlow Solutions",
-      rating: 5
-    },
-    {
-      quote: "The invoice processing automation is incredible. What used to take days now happens in minutes with 99% accuracy.",
-      author: "Marcus Rodriguez",
-      role: "Finance Director",
-      company: "GrowthCorp",
-      rating: 5
-    },
-    {
-      quote: "Their AI support assistant handles 60% of our tickets automatically. Our team can finally focus on complex issues.",
-      author: "Emily Watson",
-      role: "Customer Success Manager",
-      company: "ServicePro",
-      rating: 5
-    }
-  ];
+
+  // Load reviews from localStorage
+  useEffect(() => {
+    const loadReviews = () => {
+      const stored = localStorage.getItem(REVIEWS_STORAGE_KEY);
+      if (stored) {
+        try {
+          const reviews: Review[] = JSON.parse(stored);
+          // Sort: featured first, then by order
+          const sorted = reviews.sort((a, b) => {
+            if (a.featured && !b.featured) return -1;
+            if (!a.featured && b.featured) return 1;
+            return (a.order || 0) - (b.order || 0);
+          });
+          setTestimonials(sorted);
+        } catch (e) {
+          console.error("Error loading reviews:", e);
+          loadDefaultReviews();
+        }
+      } else {
+        loadDefaultReviews();
+      }
+    };
+
+    const loadDefaultReviews = () => {
+      const defaults: Review[] = [
+        {
+          id: "review-1",
+          quote: "Import AI saved us 15 hours per week on lead qualification. Our conversion rate jumped 28% in the first month.",
+          author: "Sarah Chen",
+          role: "VP of Sales",
+          company: "TechFlow Solutions",
+          rating: 5,
+          featured: true,
+          order: 0
+        },
+        {
+          id: "review-2",
+          quote: "The invoice processing automation is incredible. What used to take days now happens in minutes with 99% accuracy.",
+          author: "Marcus Rodriguez",
+          role: "Finance Director",
+          company: "GrowthCorp",
+          rating: 5,
+          featured: true,
+          order: 1
+        },
+        {
+          id: "review-3",
+          quote: "Their AI support assistant handles 60% of our tickets automatically. Our team can finally focus on complex issues.",
+          author: "Emily Watson",
+          role: "Customer Success Manager",
+          company: "ServicePro",
+          rating: 5,
+          featured: true,
+          order: 2
+        }
+      ];
+      setTestimonials(defaults);
+      localStorage.setItem(REVIEWS_STORAGE_KEY, JSON.stringify(defaults));
+    };
+
+    loadReviews();
+  }, []);
 
   const logos = [
     "Microsoft", "Salesforce", "HubSpot", "Stripe", "Zapier", "Slack"
