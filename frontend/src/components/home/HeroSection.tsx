@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Calendar, Play, ArrowRight } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -6,6 +7,25 @@ import { useNavigate } from "react-router-dom";
 export function HeroSection() {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const [showFirstLine, setShowFirstLine] = useState(false);
+  const [showSecondLine, setShowSecondLine] = useState(false);
+
+  useEffect(() => {
+    // Show first line with a slight delay for smooth entrance
+    const firstTimer = setTimeout(() => {
+      setShowFirstLine(true);
+    }, 200);
+    
+    // Show second line after first line appears
+    const secondTimer = setTimeout(() => {
+      setShowSecondLine(true);
+    }, 800);
+
+    return () => {
+      clearTimeout(firstTimer);
+      clearTimeout(secondTimer);
+    };
+  }, []);
 
   const handleBookDemo = () => {
     if (!isAuthenticated) {
@@ -27,9 +47,19 @@ export function HeroSection() {
               AI Automation Agency for Growth and Operations
             </p>
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold leading-tight mb-6">
-              Time is money.
-              <br />
-              <span className="text-gradient">We save you both.</span>
+              {showFirstLine && (
+                <span className="inline-block animate-fade-in-down">
+                  Time is money.
+                </span>
+              )}
+              {showSecondLine && (
+                <>
+                  <br />
+                  <span className="text-gradient inline-block animate-fade-in-down" style={{ animationDelay: '0.1s' }}>
+                    We save you both.
+                  </span>
+                </>
+              )}
             </h1>
             
             <p className="text-base md:text-lg text-foreground mb-24 max-w-2xl mx-auto leading-relaxed font-medium">

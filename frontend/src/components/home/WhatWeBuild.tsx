@@ -190,7 +190,7 @@ export function WhatWeBuild() {
                 key={index}
                 className={`group relative bg-muted/20 rounded-xl p-5 backdrop-blur-sm transition-all duration-300 hover:shadow-md hover:shadow-primary/10 ${
                   isCustomAI 
-                    ? "border-2 border-yellow-500/60 hover:border-yellow-500/80 shadow-lg shadow-yellow-500/10" 
+                    ? "border-2 border-yellow-500/60 hover:border-yellow-500/80 shadow-lg shadow-yellow-500/20" 
                     : "border border-border/50 hover:border-primary/40"
                 }`}
               >
