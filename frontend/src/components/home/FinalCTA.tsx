@@ -27,10 +27,6 @@ export function FinalCTA() {
     try {
       // Get API URL using helper function
       const apiUrl = getApiUrl();
-      
-      // Create AbortController for timeout
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
 
       const response = await fetch(`${apiUrl}/api/contact/submit`, {
         method: "POST",
@@ -38,10 +34,7 @@ export function FinalCTA() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
-        signal: controller.signal,
       });
-
-      clearTimeout(timeoutId);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ message: "Server error" }));
@@ -73,14 +66,9 @@ export function FinalCTA() {
     } catch (error: any) {
       console.error("Error submitting form:", error);
       
-      let errorMessage = "Failed to send message. Please try again later.";
-      if (error.name === "AbortError") {
-        errorMessage = "Request timed out. Please check your connection and try again.";
-      } else if (error instanceof Error) {
-        errorMessage = error.message;
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : "Failed to send message. Please try again later.";
 
       toast({
         title: "Error",
