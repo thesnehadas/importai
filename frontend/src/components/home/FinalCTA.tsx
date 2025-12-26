@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Calendar, ArrowRight, Sparkles, Send } from "lucide-react";
+import { getApiUrl } from "@/lib/api";
 
 export function FinalCTA() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -24,14 +25,28 @@ export function FinalCTA() {
     setIsSubmitting(true);
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
+      // Get API URL using helper function
+      const apiUrl = getApiUrl();
+      
+      // Create AbortController for timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
       const response = await fetch(`${apiUrl}/api/contact/submit`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: "Server error" }));
+        throw new Error(errorData.message || `Server error: ${response.status}`);
+      }
 
       const data = await response.json();
 
@@ -55,11 +70,21 @@ export function FinalCTA() {
       } else {
         throw new Error(data.message || "Failed to send message");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error submitting form:", error);
+      
+      let errorMessage = "Failed to send message. Please try again later.";
+      if (error.name === "AbortError") {
+        errorMessage = "Request timed out. Please check your connection and try again.";
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to send message. Please try again later.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
