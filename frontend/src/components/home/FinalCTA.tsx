@@ -3,7 +3,7 @@ import { Calendar, ArrowRight, Sparkles } from "lucide-react";
 
 export function FinalCTA() {
   return (
-    <section className="py-24 bg-gradient-hero relative overflow-hidden">
+    <section className="py-12 md:py-16 bg-gradient-hero relative overflow-hidden">
       {/* Background Elements */}
       <div className="absolute inset-0 bg-grid-pattern opacity-[0.02] dark:opacity-[0.05]"></div>
       <div className="absolute top-10 left-1/3 w-64 h-64 bg-primary/20 rounded-full blur-3xl animate-float"></div>
@@ -24,7 +24,7 @@ export function FinalCTA() {
             </h2>
             
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              See exactly how AI can transform your workflows in a 30-minute demo tailored to your business.
+              See exactly how AI can transform your workflows in a free consultation tailored to your business.
             </p>
           </div>
 
@@ -32,7 +32,7 @@ export function FinalCTA() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
             <Button variant="hero" size="xl" className="group shadow-glow animate-glow">
               <Calendar className="w-5 h-5 mr-3" />
-              Book Your Free Demo
+              Book Free AI Consultation
               <ArrowRight className="w-5 h-5 ml-3 group-hover:translate-x-1 transition-transform" />
             </Button>
             

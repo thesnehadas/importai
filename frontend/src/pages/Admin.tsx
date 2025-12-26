@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { 
@@ -16,7 +17,8 @@ import {
   Save, 
   X,
   FileText,
-  ArrowLeft
+  ArrowLeft,
+  Star
 } from "lucide-react";
 
 interface CaseStudy {
@@ -58,6 +60,8 @@ interface CaseStudy {
   image: string;
   timelineShort: string;
   roi: string;
+  featured?: boolean;
+  createdAt?: string;
 }
 
 const STORAGE_KEY = "case_studies";
@@ -125,6 +129,8 @@ export default function Admin() {
         image: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=600&h=400&fit=crop",
         timelineShort: "Aug 2025 - Present",
         roi: "Ongoing",
+        featured: false,
+        createdAt: new Date("2025-08-01").toISOString(),
         problem: {
           title: "The Problem",
           content: `Jupiter had 1000+ food creators on their platform. CPG brands needed them. But the growth team was stuck in Gmail hell.
@@ -235,7 +241,8 @@ The system thinks about each prospect's journey, not just "send message → hope
       whyItWorked: { title: "Why It Worked", content: "" },
       tech: [""],
       tags: [""],
-      resultsShort: [{ metric: "", description: "" }]
+      resultsShort: [{ metric: "", description: "" }],
+      featured: false
     });
   };
 
@@ -265,6 +272,7 @@ The system thinks about each prospect's journey, not just "send message → hope
       return;
     }
 
+    const existingStudy = editingId ? caseStudies.find(s => s.id === editingId) : null;
     const study: CaseStudy = {
       id: formData.id,
       title: formData.title || "",
@@ -293,7 +301,9 @@ The system thinks about each prospect's journey, not just "send message → hope
       whyItWorked: formData.whyItWorked || { title: "Why It Worked", content: "" },
       tech: formData.tech?.filter(t => t.trim()) || [],
       tags: formData.tags?.filter(t => t.trim()) || [],
-      resultsShort: formData.resultsShort?.filter(r => r.metric || r.description) || []
+      resultsShort: formData.resultsShort?.filter(r => r.metric || r.description) || [],
+      featured: formData.featured || false,
+      createdAt: existingStudy?.createdAt || new Date().toISOString()
     };
 
     let updated: CaseStudy[];
@@ -302,6 +312,15 @@ The system thinks about each prospect's journey, not just "send message → hope
     } else {
       updated = [...caseStudies, study];
     }
+
+    // Sort: featured first, then by createdAt (newest first)
+    updated.sort((a, b) => {
+      if (a.featured && !b.featured) return -1;
+      if (!a.featured && b.featured) return 1;
+      const aDate = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const bDate = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return bDate - aDate; // Newest first
+    });
 
     saveCaseStudies(updated);
     setEditingId(null);
@@ -403,7 +422,15 @@ The system thinks about each prospect's journey, not just "send message → hope
                         className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
                       >
                         <div className="flex-1">
-                          <h3 className="font-semibold">{study.title}</h3>
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-semibold">{study.title}</h3>
+                            {study.featured && (
+                              <Badge variant="default" className="bg-yellow-500 text-black">
+                                <Star className="w-3 h-3 mr-1 fill-current" />
+                                Featured
+                              </Badge>
+                            )}
+                          </div>
                           <p className="text-sm text-muted-foreground">
                             {study.client} • {study.timeline}
                           </p>
@@ -593,6 +620,21 @@ The system thinks about each prospect's journey, not just "send message → hope
                         Add Tag
                       </Button>
                     </div>
+                  </div>
+
+                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <Star className={`w-5 h-5 ${formData.featured ? 'text-yellow-500 fill-yellow-500' : 'text-muted-foreground'}`} />
+                      <div>
+                        <Label htmlFor="featured" className="cursor-pointer">Feature this case study</Label>
+                        <p className="text-xs text-muted-foreground">Featured case studies appear first</p>
+                      </div>
+                    </div>
+                    <Switch
+                      id="featured"
+                      checked={formData.featured || false}
+                      onCheckedChange={(checked) => updateField("featured", checked)}
+                    />
                   </div>
                 </div>
 

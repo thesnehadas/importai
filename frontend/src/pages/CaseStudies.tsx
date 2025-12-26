@@ -18,7 +18,15 @@ export default function CaseStudies() {
     if (stored) {
       try {
         const studies = JSON.parse(stored);
-        setCaseStudies(studies);
+        // Sort: featured first, then by createdAt (newest first)
+        const sorted = studies.sort((a: any, b: any) => {
+          if (a.featured && !b.featured) return -1;
+          if (!a.featured && b.featured) return 1;
+          const aDate = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const bDate = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          return bDate - aDate; // Newest first
+        });
+        setCaseStudies(sorted);
       } catch (e) {
         console.error("Error loading case studies:", e);
       }
@@ -229,8 +237,8 @@ export default function CaseStudies() {
               Book Your Strategy Call
             </Button>
             <Button variant="outline" size="lg" asChild>
-              <Link to="/demos">
-                See Live Demos
+              <Link to="/services">
+                Explore Our Services
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Link>
             </Button>

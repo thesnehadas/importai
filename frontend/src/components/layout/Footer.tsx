@@ -39,18 +39,18 @@ export function Footer() {
             <h3 className="font-semibold mb-4">Solutions</h3>
             <ul className="space-y-3">
               <li>
-                <Link to="/demos" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Revenue Automation
+                <Link to="/services" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Growth Systems
                 </Link>
               </li>
               <li>
-                <Link to="/demos" className="text-muted-foreground hover:text-foreground transition-colors">
-                  AI Support Assistant
+                <Link to="/services" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Sales Systems
                 </Link>
               </li>
               <li>
-                <Link to="/demos" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Finance Ops
+                <Link to="/services" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Operations Systems
                 </Link>
               </li>
             </ul>

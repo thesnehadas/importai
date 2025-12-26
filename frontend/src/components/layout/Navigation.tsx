@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 
 const navigation = [
-  { name: "Demos", href: "/demos" },
+  { name: "Services", href: "/services" },
   { name: "Case Studies", href: "/case-studies" },
   { name: "About", href: "/about" },
   { name: "Contact", href: "/contact" },

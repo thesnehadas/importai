@@ -1,7 +1,7 @@
 import { HeroSection } from "@/components/home/HeroSection";
 import { ValueStrip } from "@/components/home/ValueStrip";
-import { WhatWeAutomate } from "@/components/home/WhatWeAutomate";
-import { DemoGallery } from "@/components/home/DemoGallery";
+import { WhatWeBuild } from "@/components/home/WhatWeBuild";
+import { CaseStudiesSection } from "@/components/home/CaseStudiesSection";
 import { SocialProof } from "@/components/home/SocialProof";
 import { FinalCTA } from "@/components/home/FinalCTA";
 import { AnimatedBackground } from "@/components/home/AnimatedBackground";
@@ -15,8 +15,8 @@ const Index = () => {
       <div className="relative z-10">
         <HeroSection />
         <ValueStrip />
-        <WhatWeAutomate />
-        <DemoGallery />
+        <WhatWeBuild />
+        <CaseStudiesSection />
         <SocialProof />
         <FinalCTA />
       </div>
