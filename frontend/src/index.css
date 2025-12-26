@@ -183,14 +183,16 @@
     animation: fade-in-down 0.6s ease-out forwards;
     opacity: 0;
   }
-}
-
-@layer base {
-  * {
-    @apply border-border;
+  
+  /* Google Sign-In Button Styling */
+  .g_id_signin {
+    width: 100%;
+    display: flex;
+    justify-content: center;
   }
-
-  body {
-    @apply bg-background text-foreground;
+  
+  .g_id_signin iframe {
+    width: 100% !important;
+    max-width: 100% !important;
   }
 }

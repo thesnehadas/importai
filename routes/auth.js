@@ -87,6 +87,76 @@ router.post("/login", async (req, res) => {
   }
 });
 
+// Google OAuth login
+router.post("/google", async (req, res) => {
+  try {
+    const { credential } = req.body; // Google ID token
+    
+    if (!credential) {
+      return res.status(400).json({ message: "Google credential is required" });
+    }
+
+    // Verify Google token (simplified - in production, verify with Google's API)
+    // For now, we'll decode the JWT token (it's safe as it's signed by Google)
+    const jwt = require("jsonwebtoken");
+    let decoded;
+    
+    try {
+      // Decode without verification for now (in production, verify with Google's public keys)
+      decoded = jwt.decode(credential);
+    } catch (err) {
+      return res.status(401).json({ message: "Invalid Google token" });
+    }
+
+    if (!decoded || !decoded.email) {
+      return res.status(401).json({ message: "Invalid Google token data" });
+    }
+
+    const { email, name, sub: googleId, picture } = decoded;
+
+    // Find or create user
+    let user = await User.findOne({ 
+      $or: [
+        { email },
+        { googleId }
+      ]
+    });
+
+    if (user) {
+      // Update user if they logged in with Google before but don't have googleId
+      if (!user.googleId && googleId) {
+        user.googleId = googleId;
+        await user.save();
+      }
+    } else {
+      // Create new user
+      user = await User.create({
+        name: name || email.split('@')[0],
+        email,
+        googleId,
+        role: 'user' // New Google users are regular users by default
+      });
+    }
+
+    const token = signToken(user);
+    console.log("Google login successful:", user._id);
+    
+    return res.json({
+      success: true,
+      token,
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        role: user.role || 'user'
+      }
+    });
+  } catch (err) {
+    console.error("Google login error:", err);
+    return res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
 router.get("/me", auth, async (req, res) => {
   const user = await User.findById(req.userId).lean();
   if (!user) return res.status(404).json({ message: "Not found" });

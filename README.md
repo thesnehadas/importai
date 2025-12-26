@@ -43,7 +43,30 @@ Or use the individual scripts:
    MONGODB_URI=your_mongodb_connection_string_here
    PORT=5000
    RESEND_API_KEY=re_your_resend_api_key_here
+   RESEND_FROM_EMAIL=team@importai.in
    ```
+   
+   **Frontend Environment Variables:**
+   
+   Create a `.env.local` file in the `frontend` directory:
+   ```
+   VITE_API_URL=http://localhost:5000
+   VITE_GOOGLE_CLIENT_ID=your_google_client_id_here
+   ```
+   
+   **Google OAuth Setup:**
+   - Go to [Google Cloud Console](https://console.cloud.google.com/)
+   - Create a new project or select an existing one
+   - Enable Google+ API
+   - Go to "Credentials" → "Create Credentials" → "OAuth client ID"
+   - Choose "Web application"
+   - Add authorized JavaScript origins:
+     - `http://localhost:8080` (for local development)
+     - `https://importai.in` (for production)
+   - Add authorized redirect URIs:
+     - `http://localhost:8080` (for local development)
+     - `https://importai.in` (for production)
+   - Copy the Client ID and add it to `frontend/.env.local` as `VITE_GOOGLE_CLIENT_ID`
    
    **Email Configuration (Resend):**
    - Sign up for Resend at https://resend.com (free tier available)
