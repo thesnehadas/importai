@@ -42,18 +42,15 @@ Or use the individual scripts:
    JWT_SECRET=importai_super_secret_jwt_2025
    MONGODB_URI=your_mongodb_connection_string_here
    PORT=5000
-   EMAIL_USER=your-email@gmail.com
-   EMAIL_PASSWORD=your-gmail-app-password
+   RESEND_API_KEY=re_your_resend_api_key_here
    ```
    
-   **Email Configuration:**
-   - For Gmail, you need to create an App Password:
-     1. Go to your Google Account settings
-     2. Enable 2-Step Verification
-     3. Go to App Passwords (https://myaccount.google.com/apppasswords)
-     4. Generate a new app password for "Mail"
-     5. Use this password as `EMAIL_PASSWORD` in your `.env` file
-   - `EMAIL_USER` should be your Gmail address (e.g., `team@importai.in` if using Google Workspace)
+   **Email Configuration (Resend):**
+   - Sign up for Resend at https://resend.com (free tier available)
+   - Get your API key from the Resend dashboard
+   - Add `RESEND_API_KEY` to your `.env` file
+   - For production, verify your domain in Resend to send from `team@importai.in`
+   - For testing, you can use the default `onboarding@resend.dev` sender
 
 4. **Start MongoDB** (if running locally):
    - Install MongoDB Community Edition
@@ -192,8 +189,7 @@ npm run preview # Preview production build
 - `JWT_SECRET` - Secret key for JWT tokens
 - `PORT` - Server port (default: 5000)
 - `FRONTEND_URL` - Frontend URL for CORS
-- `EMAIL_USER` - Gmail address for sending emails
-- `EMAIL_PASSWORD` - Gmail App Password (not your regular password)
+- `RESEND_API_KEY` - Resend API key for sending emails (get from https://resend.com)
 
 ### Frontend (.env.local)
 - `VITE_API_URL` - Backend API URL
