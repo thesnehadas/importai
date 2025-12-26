@@ -44,7 +44,7 @@ export function HeroSection() {
           {/* Main Headline */}
           <div className="animate-fade-in-up">
             <p className="text-xs md:text-sm text-muted-foreground mb-3 font-medium tracking-wide">
-              AI Automation Agency for Growth and Operations
+              AI Automation Agency for Growth, Sales and Operations
             </p>
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold leading-tight mb-6">
               {showFirstLine && (

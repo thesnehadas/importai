@@ -31,18 +31,16 @@ export default function About() {
       window.location.href = `${api}/go/contact`;
     }
   };
-  const stack = [
-    "LangGraph", "GPT-4", "Zapier", "Make", "HubSpot", "Twilio", 
-    "Segment", "dbt", "Retool", "Python", "TypeScript", "React"
-  ];
-
   const geoFocus = [
+    { region: "India", flag: "🇮🇳" },
     { region: "US", flag: "🇺🇸" },
-    { region: "UK", flag: "🇬🇧" },
+    { region: "GB", flag: "🇬🇧" },
     { region: "CA", flag: "🇨🇦" },
-    { region: "ANZ", flag: "🇦🇺" },
-    { region: "SEA", flag: "🇸🇬" },
-    { region: "India", flag: "🇮🇳" }
+    { region: "AU", flag: "🇦🇺" },
+    { region: "DE", flag: "🇩🇪" },
+    { region: "NL", flag: "🇳🇱" },
+    { region: "SG", flag: "🇸🇬" },
+    { region: "AE", flag: "🇦🇪" }
   ];
 
   const process = [
@@ -159,7 +157,7 @@ export default function About() {
         </div>
       </section>
 
-      {/* Mission */}
+      {/* Mission & Team */}
       <section className="py-16">
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto">
@@ -191,13 +189,44 @@ export default function About() {
               </div>
               <div className="glass-card p-8">
                 <div className="text-center mb-6">
-                  <div className="text-4xl font-bold text-gradient mb-2">2024</div>
+                  <div className="text-4xl font-bold text-gradient mb-2">2025</div>
                   <div className="text-muted-foreground">Founded with a simple belief:</div>
                 </div>
                 <blockquote className="text-lg font-medium text-center italic">
                   "AI should make work more human, not replace humans entirely."
                 </blockquote>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Team Section */}
+      <section className="py-16 bg-background-alt">
+        <div className="container mx-auto px-6">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-4xl font-bold mb-6">Built by IIT Engineers</h2>
+            <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
+              Our team brings deep technical expertise from India's premier engineering institute. 
+              We combine rigorous problem-solving skills with practical business understanding to 
+              deliver AI solutions that actually work in production.
+            </p>
+            <p className="text-muted-foreground mb-6 leading-relaxed">
+              With backgrounds in computer science, AI/ML, and systems engineering from IIT, 
+              we understand both the technical complexity and the real-world constraints of 
+              deploying automation at scale. Every solution we build is engineered for reliability, 
+              scalability, and measurable impact.
+            </p>
+            <div className="flex flex-wrap justify-center gap-4 mt-8">
+              <Badge variant="outline" className="px-4 py-2 text-sm">
+                IIT Alumni
+              </Badge>
+              <Badge variant="outline" className="px-4 py-2 text-sm">
+                Production-Ready Engineering
+              </Badge>
+              <Badge variant="outline" className="px-4 py-2 text-sm">
+                Systems Thinking
+              </Badge>
             </div>
           </div>
         </div>
@@ -229,30 +258,6 @@ export default function About() {
                   {item.description}
                 </p>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Tech Stack */}
-      <section className="py-16">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-6">Our Stack</h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              We use the best tools in the industry to build reliable, scalable automation.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap justify-center gap-4 mb-16">
-            {stack.map((tech, index) => (
-              <Badge 
-                key={index} 
-                variant="outline" 
-                className="px-4 py-2 text-sm hover:bg-primary hover:text-primary-foreground transition-colors cursor-default"
-              >
-                {tech}
-              </Badge>
             ))}
           </div>
         </div>

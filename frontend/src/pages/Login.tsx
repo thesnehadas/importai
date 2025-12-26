@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Link, useNavigate } from "react-router-dom";
-import { Mail, ArrowRight, Shield, Zap } from "lucide-react";
+import { Mail, ArrowRight } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 // Google OAuth Client ID - should be in environment variable
@@ -236,9 +236,9 @@ export default function Login() {
             <Link to="/" className="inline-flex items-center space-x-2 mb-8">
               <div className="text-2xl font-bold text-gradient">Import AI</div>
             </Link>
-            <h1 className="text-3xl font-bold mb-2">Welcome back</h1>
+            <h1 className="text-3xl font-bold mb-2">Welcome</h1>
             <p className="text-muted-foreground">
-              Access your automation dashboard and manage your AI agents.
+              Sign in to continue
             </p>
           </div>
 
@@ -432,21 +432,6 @@ export default function Login() {
         <div className="absolute bottom-20 right-1/4 w-80 h-80 bg-accent/15 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
         
         <div className="relative z-10 max-w-lg text-center">
-          <div className="glass-card p-8 mb-8">
-            <Shield className="w-12 h-12 text-primary mx-auto mb-4" />
-            <h3 className="text-2xl font-bold mb-4">Secure Access</h3>
-            <p className="text-muted-foreground">
-              Magic link authentication ensures your account stays secure while making login effortless.
-            </p>
-          </div>
-          
-          <div className="glass-card p-8">
-            <Zap className="w-12 h-12 text-primary mx-auto mb-4" />
-            <h3 className="text-2xl font-bold mb-4">Lightning Fast</h3>
-            <p className="text-muted-foreground">
-              One click access to your automation dashboard, project status, and performance metrics.
-            </p>
-          </div>
         </div>
       </div>
     </div>

@@ -21,3 +21,4 @@ contactSubmissionSchema.index({ email: 1 });
 
 module.exports = mongoose.model("ContactSubmission", contactSubmissionSchema);
 
+

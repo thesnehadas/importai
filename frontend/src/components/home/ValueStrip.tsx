@@ -20,7 +20,7 @@ export function ValueStrip() {
   ];
 
   return (
-    <section className="py-12 border-t border-border bg-background-alt">
+    <section className="py-12 border-t border-border bg-background relative z-10">
       <div className="container mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-6xl mx-auto">
           {features.map((feature, index) => (

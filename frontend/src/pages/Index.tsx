@@ -3,6 +3,7 @@ import { ValueStrip } from "@/components/home/ValueStrip";
 import { WhatWeBuild } from "@/components/home/WhatWeBuild";
 import { CaseStudiesSection } from "@/components/home/CaseStudiesSection";
 import { SocialProof } from "@/components/home/SocialProof";
+import { AboutSection } from "@/components/home/AboutSection";
 import { FinalCTA } from "@/components/home/FinalCTA";
 import { AnimatedBackground } from "@/components/home/AnimatedBackground";
 
@@ -18,6 +19,7 @@ const Index = () => {
         <WhatWeBuild />
         <CaseStudiesSection />
         <SocialProof />
+        <AboutSection />
         <FinalCTA />
       </div>
     </div>
