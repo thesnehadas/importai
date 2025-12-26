@@ -1,8 +1,36 @@
+import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, ArrowRight, MapPin, Zap, Target, Users, CheckCircle } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export default function About() {
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  // Generate stars once - more prominent
+  const stars = useMemo(() => {
+    return Array.from({ length: 60 }, (_, i) => ({
+      id: i,
+      size: Math.random() * 3 + 1,
+      left: Math.random() * 100,
+      top: Math.random() * 100,
+      delay: Math.random() * 4,
+      duration: 2 + Math.random() * 2,
+      opacity: 0.4 + Math.random() * 0.5,
+    }));
+  }, []);
+
+  const handleBookConsultation = () => {
+    if (!isAuthenticated) {
+      navigate('/login');
+    } else {
+      const api = import.meta.env.VITE_API_URL || "http://localhost:5000";
+      window.location.href = `${api}/go/contact`;
+    }
+  };
   const stack = [
     "LangGraph", "GPT-4", "Zapier", "Make", "HubSpot", "Twilio", 
     "Segment", "dbt", "Retool", "Python", "TypeScript", "React"
@@ -46,7 +74,79 @@ export default function About() {
   ];
 
   return (
-    <div className="pt-24 pb-16">
+    <div className="pt-24 pb-16 relative">
+      {/* Galaxy Stars Animation - More Prominent */}
+      <div className="fixed inset-0 w-full h-full pointer-events-none z-0 overflow-hidden">
+        {stars.map((star) => (
+          <div
+            key={star.id}
+            className="absolute rounded-full"
+            style={{
+              width: `${star.size}px`,
+              height: `${star.size}px`,
+              left: `${star.left}%`,
+              top: `${star.top}%`,
+              background: `radial-gradient(circle, rgba(255, 255, 255, ${star.opacity}) 0%, rgba(139, 92, 246, ${star.opacity * 0.3}) 40%, rgba(255, 255, 255, 0) 70%)`,
+              animation: `star-twinkle ${star.duration}s ease-in-out infinite`,
+              animationDelay: `${star.delay}s`,
+              boxShadow: `0 0 ${star.size * 4}px rgba(255, 255, 255, ${star.opacity * 0.8}), 0 0 ${star.size * 8}px rgba(139, 92, 246, ${star.opacity * 0.3})`
+            }}
+          />
+        ))}
+        {/* Additional larger stars for depth */}
+        {Array.from({ length: 15 }, (_, i) => {
+          const size = 3 + Math.random() * 2;
+          const left = Math.random() * 100;
+          const top = Math.random() * 100;
+          const delay = Math.random() * 3;
+          return (
+            <div
+              key={`large-${i}`}
+              className="absolute rounded-full"
+              style={{
+                width: `${size}px`,
+                height: `${size}px`,
+                left: `${left}%`,
+                top: `${top}%`,
+                background: `radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, rgba(139, 92, 246, 0.4) 50%, transparent 80%)`,
+                animation: `star-pulse ${2 + Math.random() * 2}s ease-in-out infinite`,
+                animationDelay: `${delay}s`,
+                boxShadow: `0 0 ${size * 5}px rgba(255, 255, 255, 0.6), 0 0 ${size * 10}px rgba(139, 92, 246, 0.4)`
+              }}
+            />
+          );
+        })}
+      </div>
+      <style>{`
+        @keyframes star-twinkle {
+          0%, 100% { 
+            opacity: 0.4; 
+            transform: scale(1) translate(0, 0);
+          }
+          25% { 
+            opacity: 0.8; 
+            transform: scale(1.15) translate(3px, -3px);
+          }
+          50% { 
+            opacity: 1; 
+            transform: scale(1.3) translate(-2px, 2px);
+          }
+          75% { 
+            opacity: 0.7; 
+            transform: scale(1.1) translate(2px, -2px);
+          }
+        }
+        @keyframes star-pulse {
+          0%, 100% { 
+            opacity: 0.6; 
+            transform: scale(1);
+          }
+          50% { 
+            opacity: 1; 
+            transform: scale(1.2);
+          }
+        }
+      `}</style>
       {/* Header */}
       <section className="py-16 bg-gradient-hero">
         <div className="container mx-auto px-6 text-center">
@@ -179,23 +279,40 @@ export default function About() {
         </div>
       </section>
 
-      {/* CTA */}
+      {/* Final CTA Section */}
       <section className="py-16">
-        <div className="container mx-auto px-6 text-center">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-4xl font-bold mb-6">Ready to automate your workflow?</h2>
-            <p className="text-xl text-muted-foreground mb-8">
-              Let's discuss your specific challenges and show you exactly how AI can transform your operations.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button variant="hero" size="lg">
-                <Calendar className="w-5 h-5 mr-3" />
-                Book Strategy Call
-              </Button>
-              <Button variant="outline" size="lg">
-                View Case Studies
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
+        <div className="container mx-auto px-6 max-w-4xl mt-20 relative z-10">
+          <div className="relative bg-gradient-to-br from-primary/20 via-accent/10 to-primary/20 rounded-2xl p-10 border border-primary/30 text-center overflow-hidden">
+            {/* Background decoration */}
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-0 left-0 w-48 h-48 bg-primary rounded-full blur-3xl"></div>
+              <div className="absolute bottom-0 right-0 w-48 h-48 bg-accent rounded-full blur-3xl"></div>
+            </div>
+            
+            <div className="relative z-10">
+              <h3 className="text-2xl md:text-3xl font-bold mb-4">
+                Ready to automate your workflow?
+              </h3>
+              <p className="text-base text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
+                Let's discuss your specific challenges and show you exactly how AI can transform your operations.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button
+                  onClick={handleBookConsultation}
+                  variant="gradient"
+                  size="default"
+                  className="px-6 py-3 shadow-md shadow-primary/30"
+                >
+                  <Calendar className="w-5 h-5 mr-3" />
+                  Book Strategy Call
+                </Button>
+                <Button variant="outline" size="default" className="px-6 py-3" asChild>
+                  <Link to="/case-studies">
+                    View Case Studies
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Link>
+                </Button>
+              </div>
             </div>
           </div>
         </div>

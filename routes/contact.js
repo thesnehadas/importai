@@ -8,13 +8,13 @@ const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KE
 // Contact form submission endpoint
 router.post("/submit", async (req, res) => {
   try {
-    const { name, email, company, role, useCase, details } = req.body;
+    const { name, email, company, role, useCase, details, budget } = req.body;
 
     // Validate required fields
     if (!name || !email || !company || !role || !useCase || !details) {
       return res.status(400).json({
         success: false,
-        message: "All fields are required",
+        message: "All required fields must be filled",
       });
     }
 
@@ -43,6 +43,7 @@ router.post("/submit", async (req, res) => {
         <div style="background-color: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
           <h3 style="margin-top: 0; color: #333;">Project Details</h3>
           <p><strong>Use Case:</strong> ${useCase}</p>
+          ${budget ? `<p><strong>Budget:</strong> ${budget}</p>` : ''}
           <p><strong>Details:</strong></p>
           <p style="white-space: pre-wrap; background-color: white; padding: 15px; border-radius: 4px;">${details}</p>
         </div>
@@ -65,6 +66,7 @@ Contact Information:
 
 Project Details:
 - Use Case: ${useCase}
+${budget ? `- Budget: ${budget}` : ''}
 - Details: ${details}
 
 ---

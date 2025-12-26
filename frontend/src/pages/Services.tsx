@@ -151,7 +151,7 @@ export default function Services() {
   ];
 
   return (
-    <div className="min-h-screen bg-background pt-32 pb-20 relative overflow-hidden">
+    <div className="pt-24 pb-16 relative">
       {/* Galaxy Stars Animation - More Prominent */}
       <div className="fixed inset-0 w-full h-full pointer-events-none z-0 overflow-hidden">
         {stars.map((star) => (
@@ -226,19 +226,20 @@ export default function Services() {
       `}</style>
 
       {/* Hero Section */}
-      <div className="container mx-auto px-6 max-w-6xl mb-20 relative z-10">
-        <div className="text-center">
-          <h1 className="text-3xl md:text-4xl font-bold mb-6">
-            <span className="text-gradient">Services</span>
+      <section className="py-16 bg-gradient-hero min-h-[280px] flex items-center">
+        <div className="container mx-auto px-6 text-center w-full">
+          <h1 className="text-5xl md:text-6xl font-bold mb-6">
+            <span className="text-white">Our </span><span className="text-gradient">Services</span>
           </h1>
-          <p className="text-base md:text-lg text-muted-foreground max-w-4xl mx-auto leading-relaxed">
-            We build AI systems that run your growth, sales, and operations on autopilot—so you can focus on strategy while automation handles execution.
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            We build AI systems that run your growth, sales, and operations<br />on autopilot—so you can focus on strategy while automation handles execution.
           </p>
         </div>
-      </div>
+      </section>
 
       {/* Services Sections */}
-      <div className="container mx-auto px-6 max-w-6xl space-y-8 relative z-10">
+      <section className="py-16">
+        <div className="container mx-auto px-6 max-w-6xl space-y-8 relative z-10">
         {services.map((service, index) => {
           const Icon = service.icon;
           return (
@@ -335,17 +336,26 @@ export default function Services() {
             <p className="text-base text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
               Let's talk about what AI can do for your specific workflow.
             </p>
-            <Button
-              onClick={handleBookConsultation}
-              variant="gradient"
-              size="default"
-              className="px-6 py-3 shadow-md shadow-primary/30"
-            >
-              Book Free AI Consultation
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button
+                onClick={handleBookConsultation}
+                variant="gradient"
+                size="default"
+                className="px-6 py-3 shadow-md shadow-primary/30"
+              >
+                Book Free AI Consultation
+              </Button>
+              <Button variant="outline" size="default" className="px-6 py-3" asChild>
+                <Link to="/case-studies">
+                  View Case Studies
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
+        </div>
+      </section>
     </div>
   );
 }

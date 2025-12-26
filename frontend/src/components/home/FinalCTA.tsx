@@ -110,7 +110,7 @@ export function FinalCTA() {
       <div className="container mx-auto px-6 relative z-10">
         {/* Headline */}
         <div className="text-center mb-6">
-          <div className="inline-flex items-center space-x-2 bg-primary/10 text-primary px-3 py-1.5 rounded-full mb-3 text-xs">
+          <div className="inline-flex items-center space-x-2 bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 px-3 py-1.5 rounded-full mb-3 text-xs">
             <Sparkles className="w-3 h-3" />
             <span className="font-medium">Ready to automate?</span>
           </div>
