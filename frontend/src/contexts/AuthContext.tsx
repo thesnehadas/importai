@@ -7,6 +7,7 @@ interface AuthContextType {
   userName: string | null;
   userRole: string | null;
   isAdmin: boolean;
+  isLoading: boolean;
   login: (token: string, userName: string, role?: string) => void;
   logout: () => void;
 }
@@ -23,6 +24,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [userRole, setUserRole] = useState<string | null>(() => {
     return localStorage.getItem('user_role');
   });
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // Fetch user info if token exists but userName or role is missing
   useEffect(() => {
@@ -51,18 +53,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const role = user.role || 'user';
             setUserRole(role);
             localStorage.setItem('user_role', role);
+            console.log('AuthContext: User info loaded', { name: user.name, role });
           } else if (response.status === 401) {
             // Token is invalid, clear everything
+            console.log('AuthContext: Token invalid, clearing auth');
             setToken(null);
             setUserName(null);
             setUserRole(null);
             localStorage.removeItem('auth_token');
             localStorage.removeItem('user_name');
             localStorage.removeItem('user_role');
+          } else {
+            console.error('AuthContext: Failed to fetch user info, status:', response.status);
           }
         } catch (error) {
-          console.error('Failed to fetch user info:', error);
+          console.error('AuthContext: Failed to fetch user info:', error);
+          // On network error, keep existing token but mark as loaded
+        } finally {
+          setIsLoading(false);
         }
+      } else {
+        // No token, not loading
+        setIsLoading(false);
+        console.log('AuthContext: No token found, loading complete');
       }
     };
 
@@ -91,7 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const isAdmin = userRole === 'admin';
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, token, userName, userRole, isAdmin, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, token, userName, userRole, isAdmin, isLoading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
