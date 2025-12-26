@@ -912,16 +912,29 @@ The system thinks about each prospect's journey, not just "send message → hope
           description: `Article has been ${editingArticleId ? "updated" : "created"} successfully.`,
         });
       } else {
-        const error = await response.json();
-        const errorMessage = error.errors 
-          ? error.errors.join(', ') 
-          : error.message || error.details || "Failed to save article";
+        let errorMessage = "Failed to save article";
+        try {
+          const error = await response.json();
+          if (error.errors && Array.isArray(error.errors)) {
+            errorMessage = error.errors.join(', ');
+          } else if (error.message) {
+            errorMessage = error.message;
+          } else if (error.error) {
+            errorMessage = error.error;
+          } else if (error.details) {
+            errorMessage = error.details;
+          }
+          console.error("Article save error:", error);
+        } catch (parseError) {
+          // If response is not JSON, use status text
+          errorMessage = response.statusText || "Failed to save article";
+          console.error("Error parsing response:", parseError);
+        }
         toast({
           title: "Error",
           description: errorMessage,
           variant: "destructive",
         });
-        console.error("Article save error:", error);
       }
     } catch (error: any) {
       toast({

@@ -14,18 +14,20 @@ function generateSlug(title) {
 
 // Helper function to calculate SEO score
 function calculateSEOScore(article) {
+  if (!article) return 0;
+  
   let score = 0;
   const checks = {
     hasMetaTitle: !!article.metaTitle && article.metaTitle.length >= 50 && article.metaTitle.length <= 60,
     hasMetaDescription: !!article.metaDescription && article.metaDescription.length >= 140 && article.metaDescription.length <= 160,
     hasPrimaryKeyword: !!article.primaryKeyword,
-    hasH1: article.content.includes('<h1>') || article.content.match(/^#\s/),
-    hasH2: article.content.includes('<h2>') || article.content.match(/^##\s/),
+    hasH1: !!(article.content && (article.content.includes('<h1>') || article.content.match(/^#\s/))),
+    hasH2: !!(article.content && (article.content.includes('<h2>') || article.content.match(/^##\s/))),
     hasFeaturedImage: !!article.featuredImage?.url,
     hasAltText: !!article.featuredImage?.alt,
-    hasInternalLinks: article.internalLinks && article.internalLinks.length > 0,
-    hasExternalLinks: article.externalLinks && article.externalLinks.length > 0,
-    wordCount: article.wordCount >= 300 && article.wordCount <= 3000,
+    hasInternalLinks: !!(article.internalLinks && Array.isArray(article.internalLinks) && article.internalLinks.length > 0),
+    hasExternalLinks: !!(article.externalLinks && Array.isArray(article.externalLinks) && article.externalLinks.length > 0),
+    wordCount: !!(article.wordCount && article.wordCount >= 300 && article.wordCount <= 3000),
   };
   
   // Calculate score (10 points per check)
@@ -126,16 +128,16 @@ router.post("/", auth, async (req, res) => {
     const articleData = req.body;
     
     // Validate required fields
-    if (!articleData.title) {
+    if (!articleData.title || !articleData.title.trim()) {
       return res.status(400).json({ message: "Title is required" });
     }
     
-    if (!articleData.content) {
+    if (!articleData.content || !articleData.content.trim()) {
       return res.status(400).json({ message: "Content is required" });
     }
     
-    // Generate slug if not provided
-    if (!articleData.slug && articleData.title) {
+    // Generate slug if not provided or empty
+    if (!articleData.slug || !articleData.slug.trim()) {
       articleData.slug = generateSlug(articleData.title);
     }
     
@@ -148,10 +150,15 @@ router.post("/", auth, async (req, res) => {
         .replace(/[\s_-]+/g, '-') // Replace spaces and underscores with hyphens
         .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
       
-      // Ensure slug is not empty
-      if (!articleData.slug) {
+      // Ensure slug is not empty after cleaning
+      if (!articleData.slug || articleData.slug.length === 0) {
         articleData.slug = generateSlug(articleData.title);
       }
+    }
+    
+    // Final validation - slug must exist
+    if (!articleData.slug || articleData.slug.length === 0) {
+      return res.status(400).json({ message: "Unable to generate valid slug from title" });
     }
     
     // Ensure slug is unique
@@ -173,8 +180,10 @@ router.post("/", auth, async (req, res) => {
     // Calculate SEO score
     articleData.seoScore = calculateSEOScore(articleData);
     
-    // Set createdBy
-    articleData.createdBy = req.user.id;
+    // Set createdBy (ensure req.user exists)
+    if (req.user && req.user.id) {
+      articleData.createdBy = req.user.id;
+    }
     
     // Clean up empty arrays and objects
     if (articleData.secondaryKeywords && articleData.secondaryKeywords.length === 0) {
@@ -191,14 +200,15 @@ router.post("/", auth, async (req, res) => {
     res.status(201).json(article);
   } catch (error) {
     console.error("Error creating article:", error);
+    console.error("Error details:", JSON.stringify(error, null, 2));
     
     // Handle Mongoose validation errors
-    if (error.name === 'ValidationError') {
+    if (error.name === 'ValidationError' && error.errors) {
       const errors = Object.values(error.errors).map(err => err.message);
       return res.status(400).json({ 
         message: "Validation error", 
         errors: errors,
-        details: error.message 
+        details: error.message || "Invalid data provided"
       });
     }
     
@@ -210,10 +220,14 @@ router.post("/", auth, async (req, res) => {
       });
     }
     
+    // Safe error message extraction
+    const errorMessage = error?.message || "Unknown error occurred";
+    const errorDetails = error?.toString() || String(error);
+    
     res.status(400).json({ 
       message: "Error creating article", 
-      error: error.message,
-      details: error.toString()
+      error: errorMessage,
+      details: errorDetails
     });
   }
 });
