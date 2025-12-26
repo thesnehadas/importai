@@ -125,9 +125,33 @@ router.post("/", auth, async (req, res) => {
     
     const articleData = req.body;
     
+    // Validate required fields
+    if (!articleData.title) {
+      return res.status(400).json({ message: "Title is required" });
+    }
+    
+    if (!articleData.content) {
+      return res.status(400).json({ message: "Content is required" });
+    }
+    
     // Generate slug if not provided
     if (!articleData.slug && articleData.title) {
       articleData.slug = generateSlug(articleData.title);
+    }
+    
+    // Clean and validate slug
+    if (articleData.slug) {
+      articleData.slug = articleData.slug
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, '') // Remove special characters
+        .replace(/[\s_-]+/g, '-') // Replace spaces and underscores with hyphens
+        .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
+      
+      // Ensure slug is not empty
+      if (!articleData.slug) {
+        articleData.slug = generateSlug(articleData.title);
+      }
     }
     
     // Ensure slug is unique
@@ -152,11 +176,45 @@ router.post("/", auth, async (req, res) => {
     // Set createdBy
     articleData.createdBy = req.user.id;
     
+    // Clean up empty arrays and objects
+    if (articleData.secondaryKeywords && articleData.secondaryKeywords.length === 0) {
+      delete articleData.secondaryKeywords;
+    }
+    if (articleData.tags && articleData.tags.length === 0) {
+      delete articleData.tags;
+    }
+    if (articleData.featuredImage && !articleData.featuredImage.url) {
+      delete articleData.featuredImage;
+    }
+    
     const article = await Article.create(articleData);
     res.status(201).json(article);
   } catch (error) {
     console.error("Error creating article:", error);
-    res.status(400).json({ message: "Error creating article", error: error.message });
+    
+    // Handle Mongoose validation errors
+    if (error.name === 'ValidationError') {
+      const errors = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({ 
+        message: "Validation error", 
+        errors: errors,
+        details: error.message 
+      });
+    }
+    
+    // Handle duplicate key error
+    if (error.code === 11000) {
+      return res.status(400).json({ 
+        message: "Duplicate entry", 
+        error: "An article with this slug already exists" 
+      });
+    }
+    
+    res.status(400).json({ 
+      message: "Error creating article", 
+      error: error.message,
+      details: error.toString()
+    });
   }
 });
 

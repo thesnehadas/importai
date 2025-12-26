@@ -15,7 +15,13 @@ const ArticleSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
-      match: /^[a-z0-9]+(?:-[a-z0-9]+)*$/, // lowercase, hyphens only
+      // More lenient validation - allows hyphens between alphanumeric characters
+      validate: {
+        validator: function(v) {
+          return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(v);
+        },
+        message: 'Slug must contain only lowercase letters, numbers, and hyphens'
+      }
     },
     
     // SEO Meta Fields

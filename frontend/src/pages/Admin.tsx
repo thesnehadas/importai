@@ -799,6 +799,34 @@ The system thinks about each prospect's journey, not just "send message → hope
   const handleSaveArticle = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      // Validate required fields
+      if (!articleFormData.title || !articleFormData.title.trim()) {
+        toast({
+          title: "Validation Error",
+          description: "Article title is required",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!articleFormData.content || !articleFormData.content.trim()) {
+        toast({
+          title: "Validation Error",
+          description: "Article content is required",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!articleFormData.slug || !articleFormData.slug.trim()) {
+        toast({
+          title: "Validation Error",
+          description: "Article slug is required",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const apiUrl = getApiUrl();
       const url = editingArticleId 
         ? `${apiUrl}/api/articles/${editingArticleId}`
@@ -806,11 +834,64 @@ The system thinks about each prospect's journey, not just "send message → hope
       
       const method = editingArticleId ? 'PUT' : 'POST';
       
-      const articleData = {
-        ...articleFormData,
-        publishedAt: articleFormData.publishedAt ? new Date(articleFormData.publishedAt).toISOString() : undefined,
-        scheduledAt: articleFormData.scheduledAt ? new Date(articleFormData.scheduledAt).toISOString() : undefined,
+      // Clean up the data before sending
+      const articleData: any = {
+        title: articleFormData.title.trim(),
+        slug: articleFormData.slug.trim(),
+        content: articleFormData.content.trim(),
       };
+
+      // Add optional fields only if they have values
+      if (articleFormData.metaTitle?.trim()) {
+        articleData.metaTitle = articleFormData.metaTitle.trim();
+      }
+      if (articleFormData.metaDescription?.trim()) {
+        articleData.metaDescription = articleFormData.metaDescription.trim();
+      }
+      if (articleFormData.excerpt?.trim()) {
+        articleData.excerpt = articleFormData.excerpt.trim();
+      }
+      if (articleFormData.primaryKeyword?.trim()) {
+        articleData.primaryKeyword = articleFormData.primaryKeyword.trim();
+      }
+      if (articleFormData.secondaryKeywords && articleFormData.secondaryKeywords.length > 0) {
+        articleData.secondaryKeywords = articleFormData.secondaryKeywords.filter((k: string) => k.trim());
+      }
+      if (articleFormData.searchIntent) {
+        articleData.searchIntent = articleFormData.searchIntent;
+      }
+      if (articleFormData.category?.trim()) {
+        articleData.category = articleFormData.category.trim();
+      }
+      if (articleFormData.tags && articleFormData.tags.length > 0) {
+        articleData.tags = articleFormData.tags.filter((t: string) => t.trim());
+      }
+      if (articleFormData.status) {
+        articleData.status = articleFormData.status;
+      }
+      if (articleFormData.schemaType) {
+        articleData.schemaType = articleFormData.schemaType;
+      }
+      if (articleFormData.publishedAt) {
+        articleData.publishedAt = new Date(articleFormData.publishedAt).toISOString();
+      }
+      if (articleFormData.scheduledAt) {
+        articleData.scheduledAt = new Date(articleFormData.scheduledAt).toISOString();
+      }
+      if (articleFormData.author?.name?.trim()) {
+        articleData.author = {
+          name: articleFormData.author.name.trim(),
+          bio: articleFormData.author.bio?.trim() || '',
+          profileImage: articleFormData.author.profileImage?.trim() || '',
+        };
+      }
+      if (articleFormData.featuredImage?.url?.trim()) {
+        articleData.featuredImage = {
+          url: articleFormData.featuredImage.url.trim(),
+          alt: articleFormData.featuredImage.alt?.trim() || '',
+          caption: articleFormData.featuredImage.caption?.trim() || '',
+        };
+      }
       
       const response = await fetch(url, {
         method,
@@ -832,11 +913,15 @@ The system thinks about each prospect's journey, not just "send message → hope
         });
       } else {
         const error = await response.json();
+        const errorMessage = error.errors 
+          ? error.errors.join(', ') 
+          : error.message || error.details || "Failed to save article";
         toast({
           title: "Error",
-          description: error.message || "Failed to save article",
+          description: errorMessage,
           variant: "destructive",
         });
+        console.error("Article save error:", error);
       }
     } catch (error: any) {
       toast({
@@ -844,6 +929,7 @@ The system thinks about each prospect's journey, not just "send message → hope
         description: error.message || "Failed to save article",
         variant: "destructive",
       });
+      console.error("Article save error:", error);
     }
   };
 
