@@ -1,6 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const { Resend } = require("resend");
+const ContactSubmission = require("../models/ContactSubmission");
+const auth = require("../middleware/auth");
+const User = require("../models/User");
 
 // Initialize Resend client
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
@@ -97,6 +100,22 @@ You can reply directly to this email to contact ${name} at ${email}.
 
       console.log("Email sent successfully via Resend:", data?.id);
       
+      // Save submission to database
+      const ipAddress = req.ip || req.connection.remoteAddress || req.headers['x-forwarded-for'];
+      const userAgent = req.headers['user-agent'];
+      
+      await ContactSubmission.create({
+        name,
+        email,
+        company,
+        role,
+        useCase,
+        details,
+        budget: budget || "",
+        ipAddress,
+        userAgent,
+      });
+      
       res.json({
         success: true,
         message: "Thank you! We'll get back to you within 24 hours.",
@@ -123,6 +142,26 @@ You can reply directly to this email to contact ${name} at ${email}.
       success: false,
       message: errorMessage,
     });
+  }
+});
+
+// GET /api/contact/submissions - Get all contact form submissions (admin only)
+router.get("/submissions", auth, async (req, res) => {
+  try {
+    // Check if user is admin
+    const user = await User.findById(req.userId);
+    if (!user || user.role !== 'admin') {
+      return res.status(403).json({ message: "Access denied. Admin only." });
+    }
+
+    const submissions = await ContactSubmission.find()
+      .sort({ createdAt: -1 })
+      .select('-__v');
+
+    res.json({ submissions });
+  } catch (error) {
+    console.error("Error fetching contact submissions:", error);
+    res.status(500).json({ message: "Failed to fetch submissions" });
   }
 });
 

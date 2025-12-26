@@ -22,7 +22,10 @@ import {
   MessageSquare,
   BookOpen,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  Users,
+  Mail,
+  Shield
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getApiUrl } from "@/lib/api";
@@ -171,7 +174,9 @@ export default function Admin() {
     loadCaseStudies();
     loadReviews();
     loadArticles();
-  }, [isAuthenticated, isAdmin, navigate, toast]);
+    loadUsers();
+    loadContactSubmissions();
+  }, [isAuthenticated, isAdmin, navigate, toast, userRole, token]);
 
   const loadCaseStudies = () => {
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -1027,6 +1032,81 @@ The system thinks about each prospect's journey, not just "send message → hope
     }
   };
 
+  const loadUsers = async () => {
+    try {
+      const apiUrl = getApiUrl();
+      const res = await fetch(`${apiUrl}/api/auth/users`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setUsers(data.users || []);
+      } else {
+        const error = await res.json().catch(() => ({ message: "Failed to load users" }));
+        console.error("Error loading users:", error);
+      }
+    } catch (error) {
+      console.error("Error loading users:", error);
+    }
+  };
+
+  const loadContactSubmissions = async () => {
+    try {
+      const apiUrl = getApiUrl();
+      const res = await fetch(`${apiUrl}/api/contact/submissions`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setContactSubmissions(data.submissions || []);
+      } else {
+        const error = await res.json().catch(() => ({ message: "Failed to load submissions" }));
+        console.error("Error loading contact submissions:", error);
+      }
+    } catch (error) {
+      console.error("Error loading contact submissions:", error);
+    }
+  };
+
+  const handleUpdateUserRole = async (userId: string, newRole: 'user' | 'admin') => {
+    try {
+      const apiUrl = getApiUrl();
+      const res = await fetch(`${apiUrl}/api/auth/users/${userId}/role`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ role: newRole }),
+      });
+      
+      if (res.ok) {
+        toast({
+          title: "Success",
+          description: `User role updated to ${newRole}`,
+        });
+        loadUsers(); // Reload users list
+      } else {
+        const error = await res.json().catch(() => ({ message: "Failed to update user role" }));
+        toast({
+          title: "Error",
+          description: error.message || "Failed to update user role",
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update user role",
+        variant: "destructive",
+      });
+    }
+  };
+
   const wordCount = articleFormData.content
     ? articleFormData.content.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim().split(' ').filter(w => w.length > 0).length
     : 0;
@@ -1065,6 +1145,14 @@ The system thinks about each prospect's journey, not just "send message → hope
             </TabsTrigger>
             <TabsTrigger value="article-form">
               {editingArticleId ? "Edit" : "New"} Article
+            </TabsTrigger>
+            <TabsTrigger value="users">
+              <Users className="w-4 h-4 mr-2" />
+              Users
+            </TabsTrigger>
+            <TabsTrigger value="contact-submissions">
+              <Mail className="w-4 h-4 mr-2" />
+              Contact Forms
             </TabsTrigger>
           </TabsList>
 
@@ -2410,6 +2498,161 @@ The system thinks about each prospect's journey, not just "send message → hope
                 </Card>
               </div>
             </div>
+          </TabsContent>
+
+          {/* Users Management Tab */}
+          <TabsContent value="users">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>User Management</CardTitle>
+                    <CardDescription>
+                      {users.length} user{users.length !== 1 ? "s" : ""} total
+                    </CardDescription>
+                  </div>
+                  <Button onClick={loadUsers} variant="outline">
+                    Refresh
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {users.length === 0 ? (
+                    <div className="text-center py-12 text-muted-foreground">
+                      <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                      <p>No users found.</p>
+                    </div>
+                  ) : (
+                    users.map((user) => (
+                      <div
+                        key={user._id}
+                        className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                      >
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-semibold">{user.name}</h3>
+                            <Badge variant={user.role === 'admin' ? 'default' : 'outline'}>
+                              {user.role === 'admin' ? (
+                                <>
+                                  <Shield className="w-3 h-3 mr-1" />
+                                  Admin
+                                </>
+                              ) : (
+                                'User'
+                              )}
+                            </Badge>
+                            {user.googleId && (
+                              <Badge variant="secondary" className="text-xs">
+                                Google
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            {user.email}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Joined: {new Date(user.createdAt).toLocaleDateString()}
+                            {user.updatedAt && user.updatedAt !== user.createdAt && (
+                              <> • Last updated: {new Date(user.updatedAt).toLocaleDateString()}</>
+                            )}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Select
+                            value={user.role}
+                            onValueChange={(value: 'user' | 'admin') => {
+                              if (user._id === users.find(u => u.role === 'admin')?._id && value === 'user') {
+                                toast({
+                                  title: "Warning",
+                                  description: "You cannot remove your own admin role",
+                                  variant: "destructive",
+                                });
+                                return;
+                              }
+                              handleUpdateUserRole(user._id, value);
+                            }}
+                          >
+                            <SelectTrigger className="w-32">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="user">User</SelectItem>
+                              <SelectItem value="admin">Admin</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Contact Submissions Tab */}
+          <TabsContent value="contact-submissions">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Contact Form Submissions</CardTitle>
+                    <CardDescription>
+                      {contactSubmissions.length} submission{contactSubmissions.length !== 1 ? "s" : ""} total
+                    </CardDescription>
+                  </div>
+                  <Button onClick={loadContactSubmissions} variant="outline">
+                    Refresh
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {contactSubmissions.length === 0 ? (
+                    <div className="text-center py-12 text-muted-foreground">
+                      <Mail className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                      <p>No contact form submissions yet.</p>
+                    </div>
+                  ) : (
+                    contactSubmissions.map((submission) => (
+                      <div
+                        key={submission._id}
+                        className="p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                      >
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <h3 className="font-semibold">{submission.name}</h3>
+                              <Badge variant="outline">{submission.role}</Badge>
+                            </div>
+                            <div className="text-sm text-muted-foreground space-y-1">
+                              <p><strong>Email:</strong> <a href={`mailto:${submission.email}`} className="text-primary hover:underline">{submission.email}</a></p>
+                              <p><strong>Company:</strong> {submission.company}</p>
+                              <p><strong>Use Case:</strong> {submission.useCase}</p>
+                              {submission.budget && (
+                                <p><strong>Budget:</strong> {submission.budget}</p>
+                              )}
+                            </div>
+                          </div>
+                          <div className="text-xs text-muted-foreground ml-4">
+                            {new Date(submission.createdAt).toLocaleString()}
+                          </div>
+                        </div>
+                        <div className="mt-3 pt-3 border-t">
+                          <p className="text-sm font-medium mb-1">Details:</p>
+                          <p className="text-sm text-muted-foreground whitespace-pre-wrap">{submission.details}</p>
+                        </div>
+                        {submission.ipAddress && (
+                          <div className="mt-2 text-xs text-muted-foreground">
+                            IP: {submission.ipAddress}
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>

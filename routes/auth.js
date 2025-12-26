@@ -164,4 +164,64 @@ router.get("/me", auth, async (req, res) => {
   return res.json(safe);
 });
 
+// GET /api/auth/users - Get all users (admin only)
+router.get("/users", auth, async (req, res) => {
+  try {
+    // Check if user is admin
+    const currentUser = await User.findById(req.userId);
+    if (!currentUser || currentUser.role !== 'admin') {
+      return res.status(403).json({ message: "Access denied. Admin only." });
+    }
+
+    const users = await User.find()
+      .select('-password')
+      .sort({ createdAt: -1 })
+      .lean();
+
+    res.json({ users });
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    res.status(500).json({ message: "Failed to fetch users" });
+  }
+});
+
+// PUT /api/auth/users/:userId/role - Update user role (admin only)
+router.put("/users/:userId/role", auth, async (req, res) => {
+  try {
+    // Check if current user is admin
+    const currentUser = await User.findById(req.userId);
+    if (!currentUser || currentUser.role !== 'admin') {
+      return res.status(403).json({ message: "Access denied. Admin only." });
+    }
+
+    const { userId } = req.params;
+    const { role } = req.body;
+
+    // Validate role
+    if (!['user', 'admin'].includes(role)) {
+      return res.status(400).json({ message: "Invalid role. Must be 'user' or 'admin'" });
+    }
+
+    // Prevent self-demotion (admin can't remove their own admin role)
+    if (userId === req.userId && role === 'user') {
+      return res.status(400).json({ message: "You cannot remove your own admin role" });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { role },
+      { new: true }
+    ).select('-password');
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({ user, message: "User role updated successfully" });
+  } catch (error) {
+    console.error("Error updating user role:", error);
+    res.status(500).json({ message: "Failed to update user role" });
+  }
+});
+
 module.exports = router;
