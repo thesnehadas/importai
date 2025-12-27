@@ -143,7 +143,7 @@ export function SocialProof() {
   return (
     <section className="py-12 md:py-16 bg-background relative overflow-hidden">
       {/* Galaxy Stars Animation - More Prominent */}
-      <div className="fixed inset-0 w-full h-full pointer-events-none z-0 overflow-hidden">
+      <div className="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-hidden">
         {stars.map((star) => (
           <div
             key={star.id}

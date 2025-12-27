@@ -244,7 +244,7 @@ export function CaseStudiesSection() {
       onMouseLeave={handleMouseLeave}
     >
       {/* Galaxy Stars Animation - More Prominent */}
-      <div className="fixed inset-0 w-full h-full pointer-events-none z-0 overflow-hidden">
+      <div className="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-hidden">
         {stars.map((star) => (
           <div
             key={star.id}
