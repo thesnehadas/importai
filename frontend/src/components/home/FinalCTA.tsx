@@ -107,35 +107,35 @@ export function FinalCTA() {
       <div className="absolute top-10 left-1/3 w-64 h-64 bg-primary/20 rounded-full blur-3xl animate-float"></div>
       <div className="absolute bottom-10 right-1/3 w-80 h-80 bg-accent/15 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
       
-      <div className="container mx-auto px-6 relative z-10">
+      <div className="container mx-auto px-4 sm:px-6 relative z-10">
         {/* Headline */}
-        <div className="text-center mb-6">
-          <div className="inline-flex items-center space-x-2 bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 px-3 py-1.5 rounded-full mb-3 text-xs">
+        <div className="text-center mb-4 sm:mb-6">
+          <div className="inline-flex items-center space-x-2 bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full mb-2 sm:mb-3 text-xs">
             <Sparkles className="w-3 h-3" />
             <span className="font-medium">Ready to automate?</span>
           </div>
           
-          <h2 className="text-3xl md:text-4xl font-bold mb-2">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">
             Time is money.{" "}
             <span className="text-gradient">We save you both.</span>
           </h2>
           
-          <p className="text-base md:text-lg text-muted-foreground max-w-3xl mx-auto">
+          <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-3xl mx-auto px-4">
             See exactly how AI can transform your workflows in a free consultation tailored to your business.
           </p>
         </div>
 
         {/* Two Column Layout: Form Left, Calendly Right */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 max-w-6xl mx-auto">
           {/* Contact Form - Left */}
-          <div className="glass-card p-5 md:p-6">
-            <h3 className="text-xl font-bold mb-4">Send us a message</h3>
-            <p className="text-sm text-muted-foreground mb-6">
+          <div className="glass-card p-4 sm:p-5 md:p-6">
+            <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Send us a message</h3>
+            <p className="text-xs sm:text-sm text-muted-foreground mb-4 sm:mb-6">
               Fill out the form and we'll get back to you within 24 hours.
             </p>
 
-            <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <form ref={formRef} onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <Label htmlFor="cta-name" className="text-xs">Name *</Label>
                   <Input 
@@ -235,10 +235,10 @@ export function FinalCTA() {
           </div>
 
           {/* Calendly Widget - Right */}
-          <div className="glass-card p-5 md:p-6">
-            <div className="mb-4">
-              <h3 className="text-xl font-bold mb-2">Or book a call</h3>
-              <p className="text-sm text-muted-foreground">
+          <div className="glass-card p-4 sm:p-5 md:p-6">
+            <div className="mb-3 sm:mb-4">
+              <h3 className="text-lg sm:text-xl font-bold mb-2">Or book a call</h3>
+              <p className="text-xs sm:text-sm text-muted-foreground">
                 Schedule a 30-minute consultation to discuss your automation needs.
               </p>
             </div>
@@ -256,7 +256,7 @@ export function FinalCTA() {
         </div>
 
         {/* Footer Note */}
-        <p className="text-xs text-muted-foreground mt-6 text-center">
+        <p className="text-xs text-muted-foreground mt-4 sm:mt-6 text-center px-4">
           No sales pitch. Just a genuine conversation about your automation needs.
         </p>
       </div>

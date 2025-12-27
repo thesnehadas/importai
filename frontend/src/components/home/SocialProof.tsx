@@ -214,30 +214,30 @@ export function SocialProof() {
           }
         }
       `}</style>
-      <div className="container mx-auto px-6 relative z-10">
+      <div className="container mx-auto px-4 sm:px-6 relative z-10">
         {/* Testimonials */}
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-3">
+        <div className="text-center mb-8 sm:mb-12">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 sm:mb-3">
             Trusted by <span className="text-gradient">forward-thinking</span> teams
           </h2>
         </div>
 
         {/* Quote Display - Single testimonial at a time */}
-        <div className="relative mb-16" style={{ minHeight: '280px' }}>
+        <div className="relative mb-12 sm:mb-16" style={{ minHeight: '240px' }}>
           {/* Navigation Arrows */}
           <button
             onClick={goToPrevious}
-            className="absolute left-2 top-1/2 -translate-y-1/2 z-20 bg-background/80 hover:bg-background border border-border rounded-full p-2 transition-all duration-300 hover:scale-110 hover:shadow-lg"
+            className="absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 z-20 bg-background/80 hover:bg-background border border-border rounded-full p-1.5 sm:p-2 transition-all duration-300 hover:scale-110 hover:shadow-lg"
             aria-label="Previous testimonial"
           >
-            <ChevronLeft className="w-5 h-5 text-foreground" />
+            <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-foreground" />
           </button>
           <button
             onClick={goToNext}
-            className="absolute right-2 top-1/2 -translate-y-1/2 z-20 bg-background/80 hover:bg-background border border-border rounded-full p-2 transition-all duration-300 hover:scale-110 hover:shadow-lg"
+            className="absolute right-1 sm:right-2 top-1/2 -translate-y-1/2 z-20 bg-background/80 hover:bg-background border border-border rounded-full p-1.5 sm:p-2 transition-all duration-300 hover:scale-110 hover:shadow-lg"
             aria-label="Next testimonial"
           >
-            <ChevronRight className="w-5 h-5 text-foreground" />
+            <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-foreground" />
           </button>
 
           {testimonials.map((testimonial, index) => {

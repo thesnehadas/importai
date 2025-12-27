@@ -39,14 +39,14 @@ export function HeroSection() {
 
     return (
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        <div className="container mx-auto px-6 pt-32 md:pt-40 pb-12 relative z-10">
+        <div className="container mx-auto px-4 sm:px-6 pt-20 sm:pt-32 md:pt-40 pb-8 sm:pb-12 relative z-10">
           <div className="max-w-6xl mx-auto text-center">
           {/* Main Headline */}
           <div className="animate-fade-in-up">
-            <p className="text-xs md:text-sm text-muted-foreground mb-3 font-medium tracking-wide">
+            <p className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-3 font-medium tracking-wide px-2">
               AI Automation Agency for Growth, Sales and Operations
             </p>
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold leading-tight mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-tight mb-4 sm:mb-6 px-2">
               {showFirstLine && (
                 <span className="inline-block animate-fade-in-down">
                   Time is money.
@@ -62,10 +62,10 @@ export function HeroSection() {
               )}
             </h1>
             
-            <p className="text-base md:text-lg text-foreground mb-24 max-w-2xl mx-auto leading-relaxed font-medium">
+            <p className="text-sm sm:text-base md:text-lg text-foreground mb-12 sm:mb-16 md:mb-24 max-w-2xl mx-auto leading-relaxed font-medium px-4">
               Production-ready AI agents that automate growth and operations,
-              <br />
-              built by{" "}
+              <br className="hidden sm:block" />
+              <span className="sm:hidden"> </span>built by{" "}
               <span className="relative inline-block">
                 <span className="relative z-10 drop-shadow-sm">IIT Engineers</span>
                 <span className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-accent rounded-full animate-highlight origin-left opacity-100" style={{ transform: 'rotate(-1deg)', boxShadow: '0 0 8px rgba(139, 92, 246, 0.5)' }}></span>
@@ -75,19 +75,20 @@ export function HeroSection() {
           </div>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mb-8 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-            <div className="flex flex-col items-center">
+          <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mb-6 sm:mb-8 animate-fade-in-up px-4" style={{ animationDelay: '0.2s' }}>
+            <div className="flex flex-col items-center w-full sm:w-auto">
               <Button 
                 variant="hero" 
                 size="lg" 
-                className="group shadow-glow"
+                className="group shadow-glow w-full sm:w-auto text-sm sm:text-base px-4 sm:px-6"
                 onClick={handleBookDemo}
               >
                 <Calendar className="w-4 h-4 mr-2" />
-                Book a Free AI Consultation
+                <span className="hidden sm:inline">Book a Free AI Consultation</span>
+                <span className="sm:hidden">Book Free Consultation</span>
                 <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
-              <p className="text-xs text-muted-foreground mt-2 text-center animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+              <p className="text-xs text-muted-foreground mt-2 text-center animate-fade-in-up max-w-xs" style={{ animationDelay: '0.3s' }}>
                 No sales pitch. Actionable recommendations tailored to your workflows.
               </p>
             </div>
@@ -95,7 +96,7 @@ export function HeroSection() {
             <Button
               variant="glass"
               size="lg"
-              className="group"
+              className="group w-full sm:w-auto text-sm sm:text-base px-4 sm:px-6"
               onClick={() => {
                 navigate('/case-studies');
               }}

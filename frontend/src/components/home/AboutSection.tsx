@@ -18,7 +18,7 @@ export function AboutSection() {
   }, []);
 
   return (
-    <section className="py-12 md:py-16 relative overflow-hidden bg-background">
+    <section className="py-8 sm:py-12 md:py-16 relative overflow-hidden bg-background">
       {/* Galaxy Stars Animation */}
       <div className="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-hidden">
         {stars.map((star) => (
@@ -47,18 +47,18 @@ export function AboutSection() {
         }
       `}</style>
 
-      <div className="container mx-auto px-6 max-w-7xl relative z-10">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+      <div className="container mx-auto px-4 sm:px-6 max-w-7xl relative z-10">
+        <div className="text-center mb-6 sm:mb-8">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4 px-4">
             Production-Ready AI Agents by <span className="text-gradient">IIT Engineers</span>
           </h2>
-          <p className="text-base md:text-lg text-muted-foreground max-w-3xl mx-auto mb-8">
+          <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-3xl mx-auto mb-6 sm:mb-8 px-4">
             We're building reliable AI automation systems for business growth, sales and operations.
           </p>
         </div>
 
         <div className="text-center">
-          <Button variant="outline" asChild>
+          <Button variant="outline" size="default" className="text-sm sm:text-base px-4 sm:px-6" asChild>
             <Link to="/about">
               Learn More About Us
               <ArrowRight className="w-4 h-4 ml-2" />

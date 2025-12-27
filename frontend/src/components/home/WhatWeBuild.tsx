@@ -74,7 +74,7 @@ export function WhatWeBuild() {
   ];
 
   return (
-    <section className="pt-16 md:pt-20 pb-8 md:pb-10 bg-background relative overflow-hidden">
+    <section className="pt-12 sm:pt-16 md:pt-20 pb-6 sm:pb-8 md:pb-10 bg-background relative overflow-hidden">
       {/* Galaxy Stars Animation - More Prominent */}
       <div className="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-hidden">
         {stars.map((star) => (
@@ -169,37 +169,37 @@ export function WhatWeBuild() {
         <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-gradient-to-tl from-accent/10 to-primary/8 rounded-full blur-3xl animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
       </div>
       
-      <div className="container mx-auto px-6 relative z-10 max-w-7xl">
+      <div className="container mx-auto px-4 sm:px-6 relative z-10 max-w-7xl">
         {/* Section Header */}
-        <div className="mb-8 md:mb-10 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-3">
+        <div className="mb-6 sm:mb-8 md:mb-10 text-center">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 sm:mb-3">
             What We <span className="text-gradient">Build</span>
           </h2>
-          <p className="text-base md:text-lg text-muted-foreground max-w-3xl mx-auto">
+          <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-3xl mx-auto px-4">
             We design and deploy AI systems that automate growth, sales, and operations — built to run reliably in production and improve over time.
           </p>
         </div>
 
         {/* Service Categories Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6 mb-6 sm:mb-8">
           {services.map((service, index) => {
             const Icon = service.icon;
             const isCustomAI = service.title === "Custom AI Agents";
             return (
               <div
                 key={index}
-                className={`group relative bg-muted/20 rounded-xl p-5 backdrop-blur-sm transition-all duration-300 hover:shadow-md hover:shadow-primary/10 ${
+                className={`group relative bg-muted/20 rounded-xl p-4 sm:p-5 backdrop-blur-sm transition-all duration-300 hover:shadow-md hover:shadow-primary/10 ${
                   isCustomAI 
                     ? "border-2 border-yellow-500/60 hover:border-yellow-500/80 shadow-lg shadow-yellow-500/20" 
                     : "border border-border/50 hover:border-primary/40"
                 }`}
               >
-                <div className="mb-4">
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform duration-300">
-                    <Icon className="w-5 h-5 text-primary" />
+                <div className="mb-3 sm:mb-4">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center mb-2 sm:mb-3 group-hover:scale-105 transition-transform duration-300">
+                    <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                   </div>
-                  <h3 className="text-lg font-bold mb-2">{service.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-snug mb-3">
+                  <h3 className="text-base sm:text-lg font-bold mb-1 sm:mb-2">{service.title}</h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground leading-snug mb-2 sm:mb-3">
                     {service.description}
                   </p>
                 </div>

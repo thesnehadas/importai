@@ -37,26 +37,26 @@ export function Navigation() {
   };
 
   return (
-    <header className="glass-card fixed top-4 left-4 right-4 z-50 px-6 py-3">
+    <header className="glass-card fixed top-2 sm:top-4 left-2 sm:left-4 right-2 sm:right-4 z-50 px-3 sm:px-6 py-2 sm:py-3">
       <nav className="flex items-center justify-between">
         {/* Logo */}
-        <Link to="/" className="flex items-center space-x-3">
+        <Link to="/" className="flex items-center space-x-2 sm:space-x-3">
           <img 
             src="/Import AI Logo PNG.png" 
             alt="Import AI Logo" 
-            className="w-10 h-10 object-contain"
+            className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
           />
-          <div className="text-2xl font-bold text-gradient">Import AI</div>
+          <div className="text-lg sm:text-2xl font-bold text-gradient">Import AI</div>
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center space-x-8">
+        <div className="hidden lg:flex items-center space-x-6 xl:space-x-8">
           {navigation.map((item) => (
             <Link
               key={item.name}
               to={item.href}
               className={cn(
-                "text-sm font-medium transition-colors hover:text-primary",
+                "text-xs xl:text-sm font-medium transition-colors hover:text-primary",
                 location.pathname === item.href
                   ? "text-primary"
                   : "text-muted-foreground"
@@ -68,19 +68,20 @@ export function Navigation() {
         </div>
 
         {/* Actions */}
-        <div className="hidden md:flex items-center space-x-4">
+        <div className="hidden lg:flex items-center space-x-2 xl:space-x-4">
           {isAuthenticated ? (
             <>
-              <span className="text-sm text-muted-foreground">
+              <span className="text-xs xl:text-sm text-muted-foreground hidden xl:inline">
                 Hello {userName || "User"}
               </span>
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="border-primary/50 bg-primary/5 hover:bg-primary/10 hover:border-primary text-primary font-semibold px-6" 
+                className="border-primary/50 bg-primary/5 hover:bg-primary/10 hover:border-primary text-primary font-semibold px-3 xl:px-6 text-xs xl:text-sm whitespace-nowrap" 
                 onClick={handleBookDemo}
               >
-                Book a Free AI Consultation
+                <span className="hidden xl:inline">Book a Free AI Consultation</span>
+                <span className="xl:hidden">Book Demo</span>
               </Button>
               <Button 
                 variant="ghost" 
@@ -100,20 +101,21 @@ export function Navigation() {
         </div>
 
         {/* Mobile Menu Button */}
-        <div className="md:hidden flex items-center space-x-2">
+        <div className="lg:hidden flex items-center space-x-2">
           <Button
             variant="ghost"
             size="icon"
+            className="h-8 w-8"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
-            {mobileMenuOpen ? <X /> : <Menu />}
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </Button>
         </div>
       </nav>
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden mt-4 pt-4 border-t border-border">
+        <div className="lg:hidden mt-4 pt-4 border-t border-border">
           <div className="space-y-4">
             {navigation.map((item) => (
               <Link
