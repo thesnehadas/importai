@@ -366,9 +366,9 @@ export function CaseStudiesSection() {
                   
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 items-center relative z-10 h-full">
                     {/* Content */}
-                    <div className="flex flex-col h-full justify-between">
-                      <div>
-                        <div className="flex items-center gap-2 mb-4">
+                    <div className="flex flex-col h-full justify-between min-w-0">
+                      <div className="flex-1 min-w-0 overflow-hidden">
+                        <div className="flex items-center gap-2 mb-3 flex-wrap">
                           {study.featured && (
                             <Badge variant="default" className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-black text-xs font-semibold shadow-lg">
                               ⭐ Featured
@@ -381,21 +381,21 @@ export function CaseStudiesSection() {
                           ))}
                         </div>
                         
-                        <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent group-hover:text-gradient transition-all duration-300">
+                        <h3 className="text-base sm:text-lg font-bold mb-2 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent group-hover:text-gradient transition-all duration-300 line-clamp-2">
                           {study.title}
                         </h3>
-                        <p className="text-xs sm:text-sm text-muted-foreground mb-4 sm:mb-6 leading-relaxed">
+                        <p className="text-xs sm:text-sm text-muted-foreground mb-3 leading-relaxed line-clamp-2">
                           {study.description}
                         </p>
 
                         {/* Results - Enhanced */}
-                        <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-4 sm:mb-6">
+                        <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-3">
                           {study.results.slice(0, 3).map((result: any, resultIndex: number) => (
-                            <div key={resultIndex} className="text-center p-2 sm:p-3 rounded-lg bg-background/40 border border-border/30 hover:border-primary/40 hover:bg-background/60 transition-all duration-300 group-hover:scale-105">
-                              <div className="text-base sm:text-xl font-bold bg-gradient-to-r from-primary via-purple-500 to-accent bg-clip-text text-transparent mb-1">
+                            <div key={resultIndex} className="text-center p-2 rounded-lg bg-background/40 border border-border/30 hover:border-primary/40 hover:bg-background/60 transition-all duration-300">
+                              <div className="text-sm sm:text-base font-bold bg-gradient-to-r from-primary via-purple-500 to-accent bg-clip-text text-transparent mb-0.5">
                                 {result.metric}
                               </div>
-                              <div className="text-[10px] sm:text-xs text-muted-foreground font-medium leading-tight">
+                              <div className="text-[9px] sm:text-[10px] text-muted-foreground font-medium leading-tight line-clamp-2">
                                 {result.description}
                               </div>
                             </div>
@@ -403,28 +403,30 @@ export function CaseStudiesSection() {
                         </div>
 
                         {/* Meta Info - Enhanced */}
-                        <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-4 text-xs">
-                          <div className="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-background/60 border border-border/30">
-                            <Clock className="w-3.5 h-3.5 text-primary" />
-                            <span className="text-muted-foreground font-medium">{study.timeline}</span>
+                        <div className="flex flex-wrap items-center gap-2 mb-3 text-xs">
+                          <div className="flex items-center space-x-1.5 px-2 py-1 rounded-full bg-background/60 border border-border/30">
+                            <Clock className="w-3 h-3 text-primary flex-shrink-0" />
+                            <span className="text-muted-foreground font-medium truncate">{study.timeline}</span>
                           </div>
-                          <div className="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-background/60 border border-border/30">
-                            <TrendingUp className="w-3.5 h-3.5 text-green-500" />
-                            <span className="text-muted-foreground font-medium">{study.roi} ROI</span>
+                          <div className="flex items-center space-x-1.5 px-2 py-1 rounded-full bg-background/60 border border-border/30">
+                            <TrendingUp className="w-3 h-3 text-green-500 flex-shrink-0" />
+                            <span className="text-muted-foreground font-medium truncate">{study.roi} ROI</span>
                           </div>
-                          <div className="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-background/60 border border-border/30">
-                            <Users className="w-3.5 h-3.5 text-accent" />
-                            <span className="text-muted-foreground font-medium">{study.industry}</span>
+                          <div className="flex items-center space-x-1.5 px-2 py-1 rounded-full bg-background/60 border border-border/30">
+                            <Users className="w-3 h-3 text-accent flex-shrink-0" />
+                            <span className="text-muted-foreground font-medium truncate">{study.industry}</span>
                           </div>
                         </div>
                       </div>
 
-                      <Button variant="gradient" size="default" className="group font-semibold shadow-lg hover:shadow-xl transition-all duration-300" asChild>
-                        <Link to={`/case-studies/${study.id}`}>
-                          Read Full Case Study
-                          <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                        </Link>
-                      </Button>
+                      <div className="mt-auto pt-2">
+                        <Button variant="gradient" size="default" className="group font-semibold shadow-lg hover:shadow-xl transition-all duration-300 w-full sm:w-auto" asChild>
+                          <Link to={`/case-studies/${study.id}`}>
+                            Read Full Case Study
+                            <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                          </Link>
+                        </Button>
+                      </div>
                     </div>
 
                     {/* Image - Enhanced */}
