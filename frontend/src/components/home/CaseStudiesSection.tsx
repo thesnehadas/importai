@@ -317,8 +317,8 @@ export function CaseStudiesSection() {
       `}</style>
       <div className="container mx-auto px-4 sm:px-6 max-w-7xl relative z-10 w-full">
         {/* Section Header */}
-        <div className="mb-6 sm:mb-8 text-center">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">
+        <div className="mb-8 sm:mb-12 text-center">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 sm:mb-3">
             Real <span className="text-gradient">Results</span>
           </h2>
           <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-3xl mx-auto px-4">
@@ -326,23 +326,23 @@ export function CaseStudiesSection() {
           </p>
         </div>
 
-        {/* Case Study Cards Container - Fixed visual height, cards swap automatically */}
-        <div className="relative mb-6" style={{ minHeight: '320px', maxHeight: '420px' }}>
-            {/* Navigation Arrows */}
-            <button
-              onClick={goToPrevious}
-              className="absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 z-20 bg-background/80 hover:bg-background border border-border rounded-full p-1.5 sm:p-2 transition-all duration-300 hover:scale-110 hover:shadow-lg"
-              aria-label="Previous case study"
-            >
-              <ChevronLeft className="w-4 h-4 sm:w-6 sm:h-6 text-foreground" />
-            </button>
-            <button
-              onClick={goToNext}
-              className="absolute right-1 sm:right-2 top-1/2 -translate-y-1/2 z-20 bg-background/80 hover:bg-background border border-border rounded-full p-1.5 sm:p-2 transition-all duration-300 hover:scale-110 hover:shadow-lg"
-              aria-label="Next case study"
-            >
-              <ChevronRight className="w-4 h-4 sm:w-6 sm:h-6 text-foreground" />
-            </button>
+        {/* Case Study Cards Container - Fixed height for all cards */}
+        <div className="relative mb-8" style={{ height: '380px' }}>
+          {/* Navigation Arrows */}
+          <button
+            onClick={goToPrevious}
+            className="absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 z-20 bg-background/80 hover:bg-background border border-border rounded-full p-1.5 sm:p-2 transition-all duration-300 hover:scale-110 hover:shadow-lg"
+            aria-label="Previous case study"
+          >
+            <ChevronLeft className="w-4 h-4 sm:w-6 sm:h-6 text-foreground" />
+          </button>
+          <button
+            onClick={goToNext}
+            className="absolute right-1 sm:right-2 top-1/2 -translate-y-1/2 z-20 bg-background/80 hover:bg-background border border-border rounded-full p-1.5 sm:p-2 transition-all duration-300 hover:scale-110 hover:shadow-lg"
+            aria-label="Next case study"
+          >
+            <ChevronRight className="w-4 h-4 sm:w-6 sm:h-6 text-foreground" />
+          </button>
 
           {displayStudies.map((study, index) => {
             const isVisible = index === visibleIndex;
@@ -357,63 +357,65 @@ export function CaseStudiesSection() {
                     : "opacity-0 translate-y-8 scale-95 z-0 pointer-events-none"
                 }`}
               >
-                <div className="relative bg-gradient-to-br from-muted/30 via-muted/20 to-muted/10 rounded-2xl p-4 sm:p-6 border border-border/50 backdrop-blur-md group hover:border-primary/50 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20 hover:scale-[1.02] overflow-hidden">
+                <div className="relative bg-gradient-to-br from-muted/30 via-muted/20 to-muted/10 rounded-2xl p-4 sm:p-6 border border-border/50 backdrop-blur-md group hover:border-primary/50 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20 overflow-hidden h-full flex flex-col">
                   {/* Animated gradient overlay */}
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
                   
                   {/* Glow effect */}
                   <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 rounded-2xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500 -z-10"></div>
                   
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 items-center relative z-10">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 items-center relative z-10 h-full">
                     {/* Content */}
-                    <div>
-                      <div className="flex items-center gap-2 mb-4">
-                        {study.featured && (
-                          <Badge variant="default" className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-black text-xs font-semibold shadow-lg">
-                            ⭐ Featured
-                          </Badge>
-                        )}
-                        {study.tags.slice(0, 2).map((tag: string, tagIndex: number) => (
-                          <Badge key={tagIndex} variant="secondary" className="text-xs bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 transition-colors">
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-                      
-                      <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent group-hover:text-gradient transition-all duration-300">
-                        {study.title}
-                      </h3>
-                      <p className="text-xs sm:text-sm text-muted-foreground mb-4 sm:mb-6 leading-relaxed">
-                        {study.description}
-                      </p>
+                    <div className="flex flex-col h-full justify-between">
+                      <div>
+                        <div className="flex items-center gap-2 mb-4">
+                          {study.featured && (
+                            <Badge variant="default" className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-black text-xs font-semibold shadow-lg">
+                              ⭐ Featured
+                            </Badge>
+                          )}
+                          {study.tags.slice(0, 2).map((tag: string, tagIndex: number) => (
+                            <Badge key={tagIndex} variant="secondary" className="text-xs bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 transition-colors">
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
+                        
+                        <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent group-hover:text-gradient transition-all duration-300">
+                          {study.title}
+                        </h3>
+                        <p className="text-xs sm:text-sm text-muted-foreground mb-4 sm:mb-6 leading-relaxed">
+                          {study.description}
+                        </p>
 
-                      {/* Results - Enhanced */}
-                      <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-4 sm:mb-6">
-                        {study.results.slice(0, 3).map((result: any, resultIndex: number) => (
-                          <div key={resultIndex} className="text-center p-2 sm:p-3 rounded-lg bg-background/40 border border-border/30 hover:border-primary/40 hover:bg-background/60 transition-all duration-300 group-hover:scale-105">
-                            <div className="text-base sm:text-xl font-bold bg-gradient-to-r from-primary via-purple-500 to-accent bg-clip-text text-transparent mb-1">
-                              {result.metric}
+                        {/* Results - Enhanced */}
+                        <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-4 sm:mb-6">
+                          {study.results.slice(0, 3).map((result: any, resultIndex: number) => (
+                            <div key={resultIndex} className="text-center p-2 sm:p-3 rounded-lg bg-background/40 border border-border/30 hover:border-primary/40 hover:bg-background/60 transition-all duration-300 group-hover:scale-105">
+                              <div className="text-base sm:text-xl font-bold bg-gradient-to-r from-primary via-purple-500 to-accent bg-clip-text text-transparent mb-1">
+                                {result.metric}
+                              </div>
+                              <div className="text-[10px] sm:text-xs text-muted-foreground font-medium leading-tight">
+                                {result.description}
+                              </div>
                             </div>
-                            <div className="text-[10px] sm:text-xs text-muted-foreground font-medium leading-tight">
-                              {result.description}
-                            </div>
+                          ))}
+                        </div>
+
+                        {/* Meta Info - Enhanced */}
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-4 text-xs">
+                          <div className="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-background/60 border border-border/30">
+                            <Clock className="w-3.5 h-3.5 text-primary" />
+                            <span className="text-muted-foreground font-medium">{study.timeline}</span>
                           </div>
-                        ))}
-                      </div>
-
-                      {/* Meta Info - Enhanced */}
-                      <div className="flex flex-wrap items-center gap-2 sm:gap-4 mb-4 sm:mb-6 text-xs">
-                        <div className="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-background/60 border border-border/30">
-                          <Clock className="w-3.5 h-3.5 text-primary" />
-                          <span className="text-muted-foreground font-medium">{study.timeline}</span>
-                        </div>
-                        <div className="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-background/60 border border-border/30">
-                          <TrendingUp className="w-3.5 h-3.5 text-green-500" />
-                          <span className="text-muted-foreground font-medium">{study.roi} ROI</span>
-                        </div>
-                        <div className="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-background/60 border border-border/30">
-                          <Users className="w-3.5 h-3.5 text-accent" />
-                          <span className="text-muted-foreground font-medium">{study.industry}</span>
+                          <div className="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-background/60 border border-border/30">
+                            <TrendingUp className="w-3.5 h-3.5 text-green-500" />
+                            <span className="text-muted-foreground font-medium">{study.roi} ROI</span>
+                          </div>
+                          <div className="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-background/60 border border-border/30">
+                            <Users className="w-3.5 h-3.5 text-accent" />
+                            <span className="text-muted-foreground font-medium">{study.industry}</span>
+                          </div>
                         </div>
                       </div>
 
@@ -426,8 +428,8 @@ export function CaseStudiesSection() {
                     </div>
 
                     {/* Image - Enhanced */}
-                    <div>
-                      <div className="relative aspect-video rounded-xl overflow-hidden group/image shadow-xl">
+                    <div className="h-full flex items-center">
+                      <div className="relative w-full aspect-video rounded-xl overflow-hidden group/image shadow-xl">
                         <img 
                           src={study.image} 
                           alt={study.company}
@@ -442,7 +444,7 @@ export function CaseStudiesSection() {
               </div>
             );
           })}
-          </div>
+        </div>
 
         {/* Progress Indicator */}
         <div className="flex justify-center gap-2 mb-8">
@@ -462,8 +464,8 @@ export function CaseStudiesSection() {
 
         {/* CTA - Always visible */}
         <div className="text-center px-4">
-          <h3 className="text-base sm:text-lg font-bold mb-2">Explore More Case Studies</h3>
-          <p className="text-xs sm:text-sm text-muted-foreground mb-4 max-w-2xl mx-auto">
+          <h3 className="text-base sm:text-lg font-bold mb-2 sm:mb-3">Explore More Case Studies</h3>
+          <p className="text-xs sm:text-sm text-muted-foreground mb-4 sm:mb-6 max-w-2xl mx-auto">
             Discover more success stories and see how AI automation can transform your business.
           </p>
           <Button variant="gradient" size="default" className="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base" asChild>

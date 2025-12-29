@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Calendar, Play, ArrowRight } from "lucide-react";
+import { Calendar, Play, ArrowRight, Sparkles } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 
@@ -43,6 +43,13 @@ export function HeroSection() {
           <div className="max-w-6xl mx-auto text-center">
           {/* Main Headline */}
           <div className="animate-fade-in-up">
+            {/* Trust Badge */}
+            <div className="mb-4 sm:mb-6 flex justify-center">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-transparent border border-yellow-500/60 text-yellow-500 animate-fade-in">
+                <Sparkles className="w-3.5 h-3.5 text-yellow-500" />
+                Trusted by YC & Shark Tank–backed startups
+              </span>
+            </div>
             <p className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-3 font-medium tracking-wide px-2">
               AI Automation Agency for Growth, Sales and Operations
             </p>
