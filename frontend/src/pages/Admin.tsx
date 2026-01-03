@@ -71,6 +71,7 @@ interface CaseStudy {
   timelineShort: string;
   roi: string;
   featured?: boolean;
+  sortPriority?: number;
   createdAt?: string;
 }
 
@@ -206,6 +207,22 @@ export default function Admin() {
       return;
     }
     
+    // DEVELOPMENT MODE: Allow access on localhost without authentication
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const devMode = isLocalhost && import.meta.env.DEV;
+    
+    if (devMode) {
+      console.log('🔧 Development mode: Admin panel access enabled without authentication');
+      loadCaseStudies();
+      loadReviews();
+      loadArticles();
+      loadUsers();
+      loadContactSubmissions();
+      loadProjects();
+      return;
+    }
+    
+    // PRODUCTION MODE: Require authentication and admin role
     // Check authentication and admin role
     if (!isAuthenticated) {
       navigate('/login');
@@ -267,6 +284,7 @@ export default function Admin() {
         timelineShort: "Aug 2025 - Present",
         roi: "Ongoing",
         featured: false,
+        sortPriority: 0,
         createdAt: new Date("2025-08-01").toISOString(),
         problem: {
           title: "The Problem",
@@ -363,6 +381,7 @@ The system thinks about each prospect's journey, not just "send message → hope
       image: "",
       timelineShort: "",
       roi: "",
+      sortPriority: 0,
       problem: { title: "The Problem", content: "" },
       solution: { 
         title: "What We Built", 
@@ -423,6 +442,7 @@ The system thinks about each prospect's journey, not just "send message → hope
       image: formData.image || "",
       timelineShort: formData.timelineShort || formData.timeline || "",
       roi: formData.roi || "",
+      sortPriority: formData.sortPriority ?? 0,
       problem: formData.problem || { title: "The Problem", content: "" },
       solution: formData.solution || { 
         title: "What We Built", 
@@ -450,13 +470,19 @@ The system thinks about each prospect's journey, not just "send message → hope
       updated = [...caseStudies, study];
     }
 
-    // Sort: featured first, then by createdAt (newest first)
+    // Sort: featured first, then by sortPriority (higher first), then by createdAt (newest first)
     updated.sort((a, b) => {
+      // Featured items first
       if (a.featured && !b.featured) return -1;
       if (!a.featured && b.featured) return 1;
+      // Then by sortPriority (higher numbers first)
+      const aPriority = a.sortPriority ?? 0;
+      const bPriority = b.sortPriority ?? 0;
+      if (aPriority !== bPriority) return bPriority - aPriority;
+      // Finally by createdAt (newest first)
       const aDate = a.createdAt ? new Date(a.createdAt).getTime() : 0;
       const bDate = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-      return bDate - aDate; // Newest first
+      return bDate - aDate;
     });
 
     saveCaseStudies(updated);
@@ -1697,6 +1723,30 @@ The system thinks about each prospect's journey, not just "send message → hope
                     </div>
                   </div>
 
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="roi">ROI</Label>
+                      <Input
+                        id="roi"
+                        value={formData.roi || ""}
+                        onChange={(e) => updateField("roi", e.target.value)}
+                        placeholder="650% or Ongoing"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        ROI value displayed in case study cards (e.g., "650%", "Ongoing")
+                      </p>
+                    </div>
+                    <div>
+                      <Label htmlFor="timelineShort">Timeline Short (for listing)</Label>
+                      <Input
+                        id="timelineShort"
+                        value={formData.timelineShort || ""}
+                        onChange={(e) => updateField("timelineShort", e.target.value)}
+                        placeholder="Aug 2025 - Present"
+                      />
+                    </div>
+                  </div>
+
                   <div>
                     <Label htmlFor="description">Short Description (for listing)</Label>
                     <Textarea
@@ -1789,6 +1839,20 @@ The system thinks about each prospect's journey, not just "send message → hope
                       checked={formData.featured || false}
                       onCheckedChange={(checked) => updateField("featured", checked)}
                     />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="sortPriority">Sort Priority</Label>
+                    <Input
+                      id="sortPriority"
+                      type="number"
+                      value={formData.sortPriority ?? 0}
+                      onChange={(e) => updateField("sortPriority", parseInt(e.target.value) || 0)}
+                      placeholder="0"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Higher numbers appear first. Featured items are prioritized, then sort priority, then creation date.
+                    </p>
                   </div>
                 </div>
 

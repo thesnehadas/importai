@@ -44,13 +44,19 @@ export default function CaseStudies() {
     if (stored) {
       try {
         const studies = JSON.parse(stored);
-        // Sort: featured first, then by createdAt (newest first)
+        // Sort: featured first, then by sortPriority (higher first), then by createdAt (newest first)
         const sorted = studies.sort((a: any, b: any) => {
+          // Featured items first
           if (a.featured && !b.featured) return -1;
           if (!a.featured && b.featured) return 1;
+          // Then by sortPriority (higher numbers first)
+          const aPriority = a.sortPriority ?? 0;
+          const bPriority = b.sortPriority ?? 0;
+          if (aPriority !== bPriority) return bPriority - aPriority;
+          // Finally by createdAt (newest first)
           const aDate = a.createdAt ? new Date(a.createdAt).getTime() : 0;
           const bDate = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-          return bDate - aDate; // Newest first
+          return bDate - aDate;
         });
         setCaseStudies(sorted);
       } catch (e) {
