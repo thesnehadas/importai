@@ -9,6 +9,7 @@ const MAX_DISPLAY = 4;
 
 export function CaseStudiesSection() {
   const [caseStudies, setCaseStudies] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [visibleIndex, setVisibleIndex] = useState(0);
   const sectionRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -34,34 +35,14 @@ export function CaseStudiesSection() {
 
   const loadCaseStudies = async () => {
     try {
+      setLoading(true);
       const apiUrl = getApiUrl();
-      console.log("Fetching case studies from:", `${apiUrl}/api/case-studies`);
       const response = await fetch(`${apiUrl}/api/case-studies`);
-      
-      console.log("Response status:", response.status);
       
       if (response.ok) {
         const data = await response.json();
-        console.log("Case studies data:", data);
-        let studies = data.caseStudies || [];
-        
-        // Sort: featured first, then by sortPriority (higher first), then by createdAt (newest first)
-        const sorted = studies.sort((a: any, b: any) => {
-          // Featured items first
-          if (a.featured && !b.featured) return -1;
-          if (!a.featured && b.featured) return 1;
-          // Then by sortPriority (higher numbers first)
-          const aPriority = a.sortPriority ?? 0;
-          const bPriority = b.sortPriority ?? 0;
-          if (aPriority !== bPriority) return bPriority - aPriority;
-          // Finally by createdAt (newest first)
-          const aDate = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-          const bDate = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-          return bDate - aDate;
-        });
-        
-        console.log("Sorted case studies:", sorted);
-        setCaseStudies(sorted.slice(0, MAX_DISPLAY));
+        // Backend already sorts the data, so use directly and just slice
+        setCaseStudies((data.caseStudies || []).slice(0, MAX_DISPLAY));
       } else {
         const errorText = await response.text();
         console.error("Error loading case studies:", response.status, errorText);
@@ -70,6 +51,8 @@ export function CaseStudiesSection() {
     } catch (error) {
       console.error("Error loading case studies:", error);
       setCaseStudies([]);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -85,7 +68,7 @@ export function CaseStudiesSection() {
       results: study.resultsShort || [],
       timeline: study.timelineShort || study.timeline,
       roi: study.roi || "",
-      description: study.description || study.solution?.content?.substring(0, 200) + "...",
+      description: study.solutionShort || study.description || "",
       image: study.image || "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=600&h=400&fit=crop",
       tags: study.tags || [],
       featured: study.featured || false
@@ -145,7 +128,26 @@ export function CaseStudiesSection() {
     setTimeout(() => setIsPaused(false), 5000);
   };
 
-  // Always show the section, even if no case studies (will show loading state)
+  // Show loading state
+  if (loading) {
+    return (
+      <section className="py-32 bg-background relative overflow-hidden min-h-screen flex items-center">
+        <div className="container mx-auto px-6 max-w-7xl relative z-10">
+          <div className="mb-16 text-center">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+              Real <span className="text-gradient">Results</span>
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Loading case studies...
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+  
+  // Show empty state if no case studies
   if (displayStudies.length === 0 && caseStudies.length === 0) {
     return (
       <section className="py-32 bg-background relative overflow-hidden min-h-screen flex items-center">

@@ -7,9 +7,10 @@ const auth = require("../middleware/auth");
 // GET /api/case-studies - Get all case studies (public) or all case studies (admin)
 router.get("/", async (req, res) => {
   try {
+    const startTime = Date.now();
     const query = {};
     
-    // Check if user is admin (optional auth - don't fail if no token)
+    // Only check auth if token is provided (skip for public requests)
     let isAdmin = false;
     const header = req.headers.authorization || "";
     const token = header.startsWith("Bearer ") ? header.slice(7) : req.cookies?.token;
@@ -19,7 +20,8 @@ router.get("/", async (req, res) => {
         const jwt = require("jsonwebtoken");
         if (process.env.JWT_SECRET) {
           const payload = jwt.verify(token, process.env.JWT_SECRET);
-          const user = await User.findById(payload.id);
+          // Only select role field to reduce query overhead
+          const user = await User.findById(payload.id).select('role').lean();
           isAdmin = user && user.role === 'admin';
         }
       } catch (err) {
@@ -34,9 +36,21 @@ router.get("/", async (req, res) => {
     // Sort by featured first, then sortPriority, then date
     const sortOrder = { featured: -1, sortPriority: -1, createdAt: -1 };
     
+    // Select only fields needed for listing page to reduce payload size
+    // Exclude large text fields: problem.content, solution.content, whyItWorked.content
+    // Also limit description length by excluding it (use solutionShort instead)
+    const fieldsToSelect = 'id title client company industry challenge solutionShort image timelineShort timeline roi tags featured sortPriority createdAt resultsShort';
+    
     const caseStudies = await CaseStudy.find(query)
+      .select(fieldsToSelect)
       .sort(sortOrder)
       .lean();
+    
+    const queryTime = Date.now() - startTime;
+    console.log(`Case studies query took ${queryTime}ms, returned ${caseStudies.length} items`);
+    
+    // Add cache header for public responses (5 minutes)
+    res.set('Cache-Control', 'public, max-age=300');
     
     res.json({
       caseStudies,

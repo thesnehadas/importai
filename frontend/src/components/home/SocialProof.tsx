@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { Star, Quote, ChevronLeft, ChevronRight } from "lucide-react";
-
-const REVIEWS_STORAGE_KEY = "reviews";
+import { getApiUrl } from "../../lib/api";
 
 interface Review {
   id?: string;
+  _id?: string;
   quote: string;
   author: string;
   role: string;
@@ -33,25 +33,29 @@ export function SocialProof() {
     }));
   }, []);
 
-  // Load reviews from localStorage
+  // Load reviews from API
   useEffect(() => {
-    const loadReviews = () => {
-      const stored = localStorage.getItem(REVIEWS_STORAGE_KEY);
-      if (stored) {
-        try {
-          const reviews: Review[] = JSON.parse(stored);
+    const loadReviews = async () => {
+      try {
+        const apiUrl = getApiUrl();
+        const response = await fetch(`${apiUrl}/api/reviews`);
+        if (response.ok) {
+          const reviews: Review[] = await response.json();
           // Sort: featured first, then by order
-          const sorted = reviews.sort((a, b) => {
-            if (a.featured && !b.featured) return -1;
-            if (!a.featured && b.featured) return 1;
-            return (a.order || 0) - (b.order || 0);
-          });
+          const sorted = reviews
+            .map((r) => ({ ...r, id: r._id || r.id }))
+            .sort((a, b) => {
+              if (a.featured && !b.featured) return -1;
+              if (!a.featured && b.featured) return 1;
+              return (a.order || 0) - (b.order || 0);
+            });
           setTestimonials(sorted);
-        } catch (e) {
-          console.error("Error loading reviews:", e);
+        } else {
+          console.error("Error loading reviews:", response.statusText);
           loadDefaultReviews();
         }
-      } else {
+      } catch (error) {
+        console.error("Error loading reviews:", error);
         loadDefaultReviews();
       }
     };
@@ -90,7 +94,6 @@ export function SocialProof() {
         }
       ];
       setTestimonials(defaults);
-      localStorage.setItem(REVIEWS_STORAGE_KEY, JSON.stringify(defaults));
     };
 
     loadReviews();

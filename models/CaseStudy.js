@@ -129,5 +129,9 @@ const CaseStudySchema = new mongoose.Schema(
   }
 );
 
+// Indexes for performance
+CaseStudySchema.index({ id: 1 }); // Unique index already exists, but explicit for queries
+CaseStudySchema.index({ featured: -1, sortPriority: -1, createdAt: -1 }); // For listing page sorting
+
 module.exports = mongoose.model("CaseStudy", CaseStudySchema);
 

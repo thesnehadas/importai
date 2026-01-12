@@ -9,6 +9,7 @@ import { getApiUrl } from "@/lib/api";
 
 export default function CaseStudies() {
   const [caseStudies, setCaseStudies] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
@@ -40,32 +41,14 @@ export default function CaseStudies() {
 
   const loadCaseStudies = async () => {
     try {
+      setLoading(true);
       const apiUrl = getApiUrl();
-      console.log("Fetching case studies from:", `${apiUrl}/api/case-studies`);
       const response = await fetch(`${apiUrl}/api/case-studies`);
-      
-      console.log("Response status:", response.status);
       
       if (response.ok) {
         const data = await response.json();
-        console.log("Case studies data:", data);
-        const studies = data.caseStudies || [];
-        // Sort: featured first, then by sortPriority (higher first), then by createdAt (newest first)
-        const sorted = studies.sort((a: any, b: any) => {
-          // Featured items first
-          if (a.featured && !b.featured) return -1;
-          if (!a.featured && b.featured) return 1;
-          // Then by sortPriority (higher numbers first)
-          const aPriority = a.sortPriority ?? 0;
-          const bPriority = b.sortPriority ?? 0;
-          if (aPriority !== bPriority) return bPriority - aPriority;
-          // Finally by createdAt (newest first)
-          const aDate = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-          const bDate = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-          return bDate - aDate;
-        });
-        console.log("Sorted case studies:", sorted);
-        setCaseStudies(sorted);
+        // Backend already sorts the data, so use directly
+        setCaseStudies(data.caseStudies || []);
       } else {
         const errorText = await response.text();
         console.error("Error loading case studies:", response.status, errorText);
@@ -74,6 +57,8 @@ export default function CaseStudies() {
     } catch (error) {
       console.error("Error loading case studies:", error);
       setCaseStudies([]);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -89,7 +74,7 @@ export default function CaseStudies() {
       results: study.resultsShort || [],
       timeline: study.timelineShort || study.timeline,
       roi: study.roi || "",
-      description: study.description || study.solution?.content?.substring(0, 200) + "...",
+      description: study.solutionShort || study.description || "",
       image: study.image || "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=600&h=400&fit=crop",
       tags: study.tags || [],
       featured: study.featured || false
@@ -187,8 +172,20 @@ export default function CaseStudies() {
       {/* Case Studies Grid */}
       <section className="py-16">
         <div className="container mx-auto px-6">
-          <div className="space-y-12">
-            {displayStudies.map((study, index) => (
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <div className="text-center">
+                <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+                <p className="text-muted-foreground">Loading case studies...</p>
+              </div>
+            </div>
+          ) : displayStudies.length === 0 ? (
+            <div className="text-center py-20">
+              <p className="text-muted-foreground">No case studies found.</p>
+            </div>
+          ) : (
+            <div className="space-y-12">
+              {displayStudies.map((study, index) => (
               <div 
                 key={study.id} 
                 className="relative bg-gradient-to-br from-muted/30 via-muted/20 to-muted/10 rounded-2xl p-6 border border-border/50 backdrop-blur-md group hover:border-primary/50 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/20 hover:scale-[1.02] overflow-hidden"
@@ -275,7 +272,8 @@ export default function CaseStudies() {
                 </div>
               </div>
             ))}
-          </div>
+            </div>
+          )}
         </div>
       </section>
 
