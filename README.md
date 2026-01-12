@@ -5,6 +5,7 @@ A full-stack web application for AI automation services with user authentication
 ## Project Structure
 
 ```
+<<<<<<< HEAD
 importai/
 ├── frontend/          # React + TypeScript + Vite
 ├── index.js           # Backend server entry point
@@ -12,6 +13,11 @@ importai/
 ├── middleware/        # Backend middleware
 ├── models/            # Backend data models
 ├── routes/            # Backend API routes
+=======
+import-ai-time-saver-34-main/
+├── frontend/          # React + TypeScript + Vite
+├── backend/           # Node.js + Express + MongoDB
+>>>>>>> 8a97c79 (Performance optimizations: reduce case studies load time)
 └── README.md
 ```
 
@@ -29,19 +35,35 @@ Or use the individual scripts:
 
 #### Backend Setup
 
+<<<<<<< HEAD
 1. **Install dependencies:**
+=======
+1. **Navigate to backend directory:**
+   ```bash
+   cd backend
+   ```
+
+2. **Install dependencies:**
+>>>>>>> 8a97c79 (Performance optimizations: reduce case studies load time)
    ```bash
    npm install
    ```
 
+<<<<<<< HEAD
 2. **Set up environment variables:**
    
    Create a `.env` file in the root directory with:
+=======
+3. **Set up environment variables:**
+   
+   Create a `.env` file in the `backend` folder with:
+>>>>>>> 8a97c79 (Performance optimizations: reduce case studies load time)
    ```
    FRONTEND_URL=http://localhost:8080
    JWT_SECRET=importai_super_secret_jwt_2025
    MONGODB_URI=your_mongodb_connection_string_here
    PORT=5000
+<<<<<<< HEAD
    RESEND_API_KEY=re_your_resend_api_key_here
    RESEND_FROM_EMAIL=team@importai.in
    ```
@@ -74,6 +96,9 @@ Or use the individual scripts:
    - Add `RESEND_API_KEY` to your `.env` file
    - For production, verify your domain in Resend to send from `team@importai.in`
    - For testing, you can use the default `onboarding@resend.dev` sender
+=======
+   ```
+>>>>>>> 8a97c79 (Performance optimizations: reduce case studies load time)
 
 4. **Start MongoDB** (if running locally):
    - Install MongoDB Community Edition
@@ -138,9 +163,12 @@ Or use the individual scripts:
 - `POST /api/auth/login` - Authenticate user
 - `GET /api/auth/me` - Get current user (protected)
 
+<<<<<<< HEAD
 #### Contact Form
 - `POST /api/contact/submit` - Submit contact form (sends email to team@importai.in with CC to snehadas.iitr@gmail.com)
 
+=======
+>>>>>>> 8a97c79 (Performance optimizations: reduce case studies load time)
 #### Demo Navigation
 - `GET /go/demos` - Redirect to demos page
 
@@ -212,7 +240,10 @@ npm run preview # Preview production build
 - `JWT_SECRET` - Secret key for JWT tokens
 - `PORT` - Server port (default: 5000)
 - `FRONTEND_URL` - Frontend URL for CORS
+<<<<<<< HEAD
 - `RESEND_API_KEY` - Resend API key for sending emails (get from https://resend.com)
+=======
+>>>>>>> 8a97c79 (Performance optimizations: reduce case studies load time)
 
 ### Frontend (.env.local)
 - `VITE_API_URL` - Backend API URL
